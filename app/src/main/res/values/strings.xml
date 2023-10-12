@@ -1,0 +1,90 @@
+<resources>
+    <string name="app_name">TMDB Movie</string>
+
+    <string name="tmdb_api_key" translatable="false">tmdb_api_key</string>
+    <string name="key_youtube_video_preview_url" translatable="false">https://img.youtube.com/vi/%s/0.jpg</string>
+    <string name="key_authentication_url" translatable="false">https://www.themoviedb.org/authenticate/%s</string>
+    <string name="key_gravatar_url" translatable="false">https://secure.gravatar.com/avatar/%s.jpg?s=200</string>
+
+    <string name="key_home">Home</string>
+    <string name="key_discovery">Discovery</string>
+    <string name="key_me">Me</string>
+    <string name="key_theme">Theme</string>
+    <string name="key_cancel">Cancel</string>
+    <string name="key_confirm">Confirm</string>
+    <string name="key_theme_setting">Theme Settings</string>
+    <string name="key_use_dark_theme">Dark Model</string>
+    <string name="key_dark_mode_system">Follow System</string>
+    <string name="key_dark_mode_light">Light</string>
+    <string name="key_dark_mode_dark">Dark</string>
+    <string name="key_use_dynamic_theme">Dynamic Theme</string>
+    <string name="key_search_movie">Search Movie</string>
+    <string name="key_search_movie_in_library">Search for \"%s\" in movie library</string>
+    <string name="key_people_trending">People Trending</string>
+    <string name="key_movies_trending">Movies Trending</string>
+    <string name="key_tv_trending">TV Trending</string>
+    <string name="key_movies_now_playing">Movies Now Playing</string>
+    <string name="key_tv_air_today">TV Air Today</string>
+    <string name="key_popular_movies">Popular Movies</string>
+    <string name="key_popular_tv">Popular TV</string>
+    <string name="key_not_connected">⚠️ You aren’t connected to the internet</string>
+    <string name="key_movies">Movies</string>
+    <string name="key_tv_shows">TV Shows</string>
+    <string name="key_load_error">Oops,something wrong!</string>
+    <string name="key_retry">retry</string>
+    <string name="key_loading">On loading…</string>
+    <string name="key_no_overview">No overview found.</string>
+    <string name="key_no_biography">No biography found.</string>
+    <string name="key_revenue">Revenue($)</string>
+    <string name="key_vote_point">User Score</string>
+    <string name="key_release_date">Release Date</string>
+    <string name="key_overview">Overview</string>
+    <string name="key_main_cast">Main Cast</string>
+    <string name="key_movie_videos">Videos</string>
+    <string name="key_popularity">Popularity</string>
+    <string name="key_first_air_date">First Air Date</string>
+    <string name="key_something_wrong">Oops! Something went wrong!</string>
+    <string name="key_backdrops">Backdrops</string>
+    <string name="key_poster">Posters</string>
+    <string name="key_gender_colon">Gender:&#160;</string>
+    <string name="key_male">Male</string>
+    <string name="key_female">Female</string>
+    <string name="key_unknown">Unknown</string>
+    <string name="key_birthday_colon">Birthday:&#160;</string>
+    <string name="key_place_of_birth_colon">Place of Birth:&#160;</string>
+    <string name="key_know_for_colon">Known For:&#160;</string>
+    <string name="key_popularity_colon">Popularity:&#160;</string>
+    <string name="key_popular_people">Popular People</string>
+    <string name="key_acting">Acting</string>
+    <string name="key_act_as">as&#160;%s</string>
+    <string name="key_act_as_1">(%1$d episode)&#160;as&#160;%2$s</string>
+    <string name="key_view_all">View all</string>
+    <string name="key_videos">Videos</string>
+    <string name="key_in_loading">Loading…</string>
+    <string name="key_know_for">Known For</string>
+    <string name="key_also_know_as">Also Known As</string>
+    <string name="key_read_more">Read more</string>
+    <string name="key_read_less">Read less</string>
+    <string name="key_people_acting">%s\'s Acting</string>
+    <string name="key_recent_search">Recent Searches</string>
+    <string name="key_biography">Biography</string>
+    <string name="key_tmdb_authenticate">TMDB Authentication</string>
+    <string name="key_copy_authenticate_url">Copy Authentication Link</string>
+    <string name="key_to_authorize">To Authorize</string>
+    <string name="key_auth_message">Please visit the TMDB (The Movie Database) official website to authorize and access your TMDB personal information.</string>
+    <string name="key_authorized">Authorized</string>
+    <string name="key_authorize_error">Obtaining authorization information error</string>
+    <string name="key_copy_success">Copy Success</string>
+    <string name="key_auth_error">Authentication Error</string>
+    <string name="key_auth_success">Authentication Success</string>
+    <string name="key_click_authorize">Click Avatar to Authorize Login</string>
+    <string name="key_sign_out">Sign Out</string>
+    <string name="key_sign_out_success">Sign Out Success</string>
+    <string name="key_sign_out_error">Sign Out Error</string>
+    <string name="key_sign_out_confirm">Sign Out Confirm</string>
+    <string name="key_sign_out_confirm_content">Are you sure you want to sign out?</string>
+    <string name="key_add_to_watchlist">Add to Watchlist</string>
+    <string name="key_remove_from_watchlist">Remove from Watchlist</string>
+    <string name="key_share">Share</string>
+    <string name="key_add_to_list">Add to List</string>
+</resources>
