@@ -3,8 +3,4 @@ Thanks for [TMDB(The Movie Database)](https://www.themoviedb.org/) provide the A
 
 The preview video:   
 
-https://github.com/sqsong66/TMDB-Movie/assets/11425148/d6f2f4e9-41b3-43eb-93fd-d74423013ad3
-
-
-
-
+https://github.com/sqsong66/TMDB-Movie/assets/11425148/32de6974-54ff-4c94-af0d-af5435ecfe33
