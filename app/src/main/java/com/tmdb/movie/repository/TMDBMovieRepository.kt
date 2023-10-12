@@ -159,6 +159,7 @@ class TMDBMovieRepository @Inject constructor(
     }.asResult()
 
     override fun getPeopleDetails(id: Int): Flow<Result<PeopleDetails>> = flow {
+        kotlinx.coroutines.delay(2000)
         emit(apiService.getPeopleDetails(id))
     }.asResult()
 

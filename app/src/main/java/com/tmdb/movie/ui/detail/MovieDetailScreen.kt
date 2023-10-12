@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,19 +27,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.R
@@ -58,6 +52,7 @@ import com.tmdb.movie.ui.detail.component.MovieBackdropLayout
 import com.tmdb.movie.ui.detail.component.MovieCastLayout
 import com.tmdb.movie.ui.detail.component.MovieDetailImageComponent
 import com.tmdb.movie.ui.detail.component.MovieDetailLoadingComponent
+import com.tmdb.movie.ui.detail.component.MovieDetailMoreAction
 import com.tmdb.movie.ui.detail.component.MovieMiddleLayout
 import com.tmdb.movie.ui.detail.component.MovieOverviewLayout
 import com.tmdb.movie.ui.detail.component.MovieVideoComponent
@@ -160,7 +155,6 @@ fun MovieDetailScreen(
     val scrollState = rememberScrollState()
     var topBarHeight by remember { mutableIntStateOf(0) }
     var topBarAlpha by remember { mutableFloatStateOf(0f) }
-    var showDropdownMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollState.value) {
         val scrollValue = scrollState.value.toFloat()
@@ -232,57 +226,13 @@ fun MovieDetailScreen(
                         tint = if (accountState?.favorite == true) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Box {
-                    IconButton(
-                        onClick = {
-                            showDropdownMenu = true
-                        }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.more_horiz_24),
-                            contentDescription = "",
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showDropdownMenu,
-                        modifier = Modifier.align(Alignment.TopEnd),
-                        properties = PopupProperties(dismissOnClickOutside = true),
-                        onDismissRequest = { showDropdownMenu = false },
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(if (accountState?.watchlist == true) R.string.key_remove_from_watchlist else R.string.key_add_to_watchlist)) },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = if (accountState?.watchlist == true) R.drawable.baseline_bookmark_added_24 else R.drawable.outline_bookmark_add_24),
-                                    contentDescription = "",
-                                    tint = if (accountState?.watchlist == true) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            onClick = onWatchlist,
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(R.string.key_add_to_list)) },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.baseline_format_list_24),
-                                    contentDescription = "",
-                                )
-                            },
-                            onClick = onAddList,
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(R.string.key_share)) },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.baseline_share_24),
-                                    contentDescription = "",
-                                )
-                            },
-                            onClick = {
-                                onShare()
-                                showDropdownMenu = false
-                            })
-                    }
-                }
+                MovieDetailMoreAction(
+                    modifier = Modifier,
+                    accountState = accountState,
+                    onWatchlist = onWatchlist,
+                    onAddList = onAddList,
+                    onShare = onShare,
+                )
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),

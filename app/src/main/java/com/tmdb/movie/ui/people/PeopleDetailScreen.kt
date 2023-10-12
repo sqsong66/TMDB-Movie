@@ -35,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.R
 import com.tmdb.movie.component.ErrorPage
-import com.tmdb.movie.component.LoadingPage
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.PeopleCast
@@ -46,6 +45,7 @@ import com.tmdb.movie.ui.people.component.AlsoKnownForComponent
 import com.tmdb.movie.ui.people.component.PeopleActingBottomSheet
 import com.tmdb.movie.ui.people.component.PeopleBgComponent
 import com.tmdb.movie.ui.people.component.PeopleBiographyComponent
+import com.tmdb.movie.ui.people.component.PeopleDetailLoadingPager
 import com.tmdb.movie.ui.people.component.PeopleDetailTopComponent
 import com.tmdb.movie.ui.people.component.PeopleKnownForComponent
 import com.tmdb.movie.ui.people.vm.PeopleDetailUiState
@@ -102,8 +102,7 @@ fun PeopleDetailScreen(
         )
         when (peopleDetailUiState) {
             is PeopleDetailUiState.Error -> ErrorPage()
-            PeopleDetailUiState.Loading -> LoadingPage()
-
+            PeopleDetailUiState.Loading -> PeopleDetailLoadingPager(topBarHeight = topBarHeight)
             is PeopleDetailUiState.Success -> {
                 peopleName = peopleDetailUiState.data.name ?: ""
                 imageUrl = onBuildImage(peopleDetailUiState.data.profilePath, ImageType.PROFILE) ?: ""
@@ -214,26 +213,27 @@ fun PeopleDetailComponent(
 fun PeopleDetailScreenPreview() {
     TMDBMovieTheme {
         PeopleDetailScreen(
-            peopleDetailUiState = PeopleDetailUiState.Success(
-                PeopleDetails(
-                    name = "Julianne Moore",
-                    gender = 1,
-                    birthday = "1960-12-03",
-                    placeOfBirth = "Fayetteville, North Carolina, USA",
-                    knownForDepartment = "Acting",
-                    popularity = 238.24f,
-                    biography = "Julie Anne Smith (born December 3, 1960), known professionally as Julianne Moore, is an American actress and author. Prolific in film since the early 1990s, she is particularly known for her portrayals of emotionally troubled women in independent films, as well as for her roles in blockbusters. She is the recipient of numerous accolades, including an Academy Award, a British Academy Film Award, two Golden Globe Awards, and two Emmy Awards.\\n\\nAfter studying theater at Boston University, Moore began her career with a series of television roles. From 1985 to 1988, she was a regular in the soap opera As the World Turns, earning a Daytime Emmy Award for her performance. Her film debut was in Tales from the Darkside: The Movie (1990), and she continued to play small roles for the next four years, including in the thriller The Hand That Rocks the Cradle (1992). Moore first received critical attention with Robert Altman's Short Cuts (1993), and successive performances in Vanya on 42nd Street (1994) and Safe (1995) continued this acclaim. Starring roles in the blockbusters Nine Months (1995) and The Lost World: Jurassic Park (1997) established her as a Hollywood leading lady.\\n\\nMoore received considerable recognition in the late 1990s and early 2000s, earning Academy Award nominations for Boogie Nights (1997), The End of the Affair (1999), Far from Heaven (2002) and The Hours (2002). In the first of these, she played a 1970s pornographic actress, while in the other three, she starred as a mid-20th century unhappy housewife. She also had success with the films The Big Lebowski (1998), Magnolia (1999), Hannibal (2001), Children of Men (2006), A Single Man (2009), The Kids Are All Right (2010), and Crazy, Stupid, Love (2011). She won a Primetime Emmy Award for her portrayal of Sarah Palin in the television film Game Change (2012). She won the Academy Award for Best Actress for her portrayal of an Alzheimer's patient in Still Alice (2014) and was named Best Actress at the Cannes Film Festival for her role in Maps to the Stars (2014). Among her highest-grossing releases are the final two films in the series The Hunger Games and the spy film Kingsman: The Golden Circle (2017).\\n\\nIn addition to her acting work, Moore has written a series of children's books about a character named \\\"Freckleface Strawberry\\\". In 2015, Time magazine named her one of the 100 most influential people in the world, and in 2020, The New York Times named her one of the greatest actors of the 21st century. She is married to director Bart Freundlich, with whom she has two children.",
-                    alsoKnownAs = listOf(
-                        "Julianne Moore",
-                        "Джулианна Мур",
-                        "جوليان مور",
-                        "줄리안 무어",
-                        "ジュリアン・ムーア",
-                        "茱莉安·摩尔",
-                        "茱莉�"
-                    )
-                ),
-            ),
+            peopleDetailUiState = PeopleDetailUiState.Loading,
+//            peopleDetailUiState = PeopleDetailUiState.Success(
+//                PeopleDetails(
+//                    name = "Julianne Moore",
+//                    gender = 1,
+//                    birthday = "1960-12-03",
+//                    placeOfBirth = "Fayetteville, North Carolina, USA",
+//                    knownForDepartment = "Acting",
+//                    popularity = 238.24f,
+//                    biography = "Julie Anne Smith (born December 3, 1960), known professionally as Julianne Moore, is an American actress and author. Prolific in film since the early 1990s, she is particularly known for her portrayals of emotionally troubled women in independent films, as well as for her roles in blockbusters. She is the recipient of numerous accolades, including an Academy Award, a British Academy Film Award, two Golden Globe Awards, and two Emmy Awards.\\n\\nAfter studying theater at Boston University, Moore began her career with a series of television roles. From 1985 to 1988, she was a regular in the soap opera As the World Turns, earning a Daytime Emmy Award for her performance. Her film debut was in Tales from the Darkside: The Movie (1990), and she continued to play small roles for the next four years, including in the thriller The Hand That Rocks the Cradle (1992). Moore first received critical attention with Robert Altman's Short Cuts (1993), and successive performances in Vanya on 42nd Street (1994) and Safe (1995) continued this acclaim. Starring roles in the blockbusters Nine Months (1995) and The Lost World: Jurassic Park (1997) established her as a Hollywood leading lady.\\n\\nMoore received considerable recognition in the late 1990s and early 2000s, earning Academy Award nominations for Boogie Nights (1997), The End of the Affair (1999), Far from Heaven (2002) and The Hours (2002). In the first of these, she played a 1970s pornographic actress, while in the other three, she starred as a mid-20th century unhappy housewife. She also had success with the films The Big Lebowski (1998), Magnolia (1999), Hannibal (2001), Children of Men (2006), A Single Man (2009), The Kids Are All Right (2010), and Crazy, Stupid, Love (2011). She won a Primetime Emmy Award for her portrayal of Sarah Palin in the television film Game Change (2012). She won the Academy Award for Best Actress for her portrayal of an Alzheimer's patient in Still Alice (2014) and was named Best Actress at the Cannes Film Festival for her role in Maps to the Stars (2014). Among her highest-grossing releases are the final two films in the series The Hunger Games and the spy film Kingsman: The Golden Circle (2017).\\n\\nIn addition to her acting work, Moore has written a series of children's books about a character named \\\"Freckleface Strawberry\\\". In 2015, Time magazine named her one of the 100 most influential people in the world, and in 2020, The New York Times named her one of the greatest actors of the 21st century. She is married to director Bart Freundlich, with whom she has two children.",
+//                    alsoKnownAs = listOf(
+//                        "Julianne Moore",
+//                        "Джулианна Мур",
+//                        "جوليان مور",
+//                        "줄리안 무어",
+//                        "ジュリアン・ムーア",
+//                        "茱莉安·摩尔",
+//                        "茱莉�"
+//                    )
+//                ),
+//            ),
             peopleCredits = SortedPeopleCredits(
                 knownForCredits = listOf(
                     PeopleCast(

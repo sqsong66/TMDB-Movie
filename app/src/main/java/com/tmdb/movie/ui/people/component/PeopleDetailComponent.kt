@@ -228,40 +228,6 @@ fun LazyListScope.peopleActingComponent(
             }
         }
     }
-
-    /*Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.key_acting),
-            modifier = Modifier,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
-            maxLines = 1,
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        ) {
-            sortedCasts.forEach { castList ->
-                castList.forEachIndexed { index, peopleCast ->
-                    PeopleCastComponent(
-                        modifier = Modifier,
-                        peopleCast = peopleCast,
-                        isFirst = index == 0,
-                        isTest = isTest,
-                        onBuildImage = onBuildImage
-                    )
-                }
-            }
-        }
-    }*/
 }
 
 @Composable
@@ -364,7 +330,10 @@ fun PeopleCastComponent(
                     modifier = Modifier.padding(top = 14.dp),
                     text = monthDay,
                     style = MaterialTheme.typography.bodySmall
-                        .copy(color = MaterialTheme.colorScheme.primary)
+                        .copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
                 )
             }
             Row {

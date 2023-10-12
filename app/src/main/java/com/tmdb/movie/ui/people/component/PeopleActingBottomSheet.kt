@@ -33,7 +33,6 @@ fun PeopleActingBottomSheet(
         modifier = Modifier.fillMaxSize(),
         sheetState = sheetState,
         onDismissRequest = onBottomSheetDismiss,
-//        shape = RoundedCornerShape(0.dp),
         dragHandle = { },
     ) {
         BottomSheetContent(
@@ -60,7 +59,7 @@ fun BottomSheetContent(
             moreText = "",
             onMoreTextClick = {}
         )
-        LazyColumn() {
+        LazyColumn {
             peopleActingComponent(
                 sortedCasts = castLists,
                 onBuildImage = onBuildImage,
