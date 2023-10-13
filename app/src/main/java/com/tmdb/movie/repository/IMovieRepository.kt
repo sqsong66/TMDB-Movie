@@ -2,6 +2,7 @@ package com.tmdb.movie.repository
 
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.MediaType
@@ -9,6 +10,7 @@ import com.tmdb.movie.data.People
 import com.tmdb.movie.data.PeopleCredits
 import com.tmdb.movie.data.PeopleDetails
 import com.tmdb.movie.data.RequestTokenInfo
+import com.tmdb.movie.data.ResponseResult
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.TMDBConfiguration
@@ -69,4 +71,8 @@ interface IMovieRepository {
     fun markAsFavorite(accountId: Int, sessionId: String, @MediaType mediaType: Int, mediaId: Int, favorite: Boolean): Flow<Result<Boolean>>
 
     fun addToWatchlist(accountId: Int, sessionId: String, @MediaType mediaType: Int, mediaId: Int, watchlist: Boolean): Flow<Result<Boolean>>
+
+    fun getAccountMediaLists(accountId: Int): Flow<Result<List<MediaList>?>>
+
+    fun addMediaToList(sessionId: String, mediaId: Int, listId: Int): Flow<Result<ResponseResult>>
 }

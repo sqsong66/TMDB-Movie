@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -35,7 +36,7 @@ class AuthenticationViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val refreshState = refreshKey.filter { it.isNotEmpty() }
+    private val refreshState = refreshKey.filter { it.isNotEmpty() }
         .flatMapLatest { repository.getRequestToken() }
         .map {
             when (it) {
@@ -50,6 +51,10 @@ class AuthenticationViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = AuthenticationUiState.Loading
         )
+
+    init {
+        refreshState.launchIn(viewModelScope)
+    }
 
     fun updateOnAuthorize() {
         _uiState.value.let {

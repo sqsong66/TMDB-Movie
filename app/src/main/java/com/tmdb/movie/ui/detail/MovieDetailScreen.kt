@@ -1,6 +1,7 @@
 package com.tmdb.movie.ui.detail
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -27,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -56,6 +58,9 @@ import com.tmdb.movie.ui.detail.component.MovieDetailMoreAction
 import com.tmdb.movie.ui.detail.component.MovieMiddleLayout
 import com.tmdb.movie.ui.detail.component.MovieOverviewLayout
 import com.tmdb.movie.ui.detail.component.MovieVideoComponent
+import com.tmdb.movie.ui.detail.sheet.MediaListBottomSheet
+import com.tmdb.movie.ui.detail.vm.AddListUiState
+import com.tmdb.movie.ui.detail.vm.MediaListUiState
 import com.tmdb.movie.ui.detail.vm.MovieDetailUiState
 import com.tmdb.movie.ui.detail.vm.MovieDetailViewModel
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
@@ -67,6 +72,7 @@ fun MovieDetailRoute(
     mediaId: Int,
     @MediaType mediaType: Int,
     movieFrom: Int,
+    toLogin: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
     viewModel: MovieDetailViewModel = hiltViewModel(),
@@ -74,16 +80,65 @@ fun MovieDetailRoute(
 
     BackHandler { onBackClick(movieFrom == 0) }
     val context = LocalContext.current
+    var showMediaListBottomSheet by remember { mutableStateOf(false) }
     val config by viewModel.configStream.collectAsStateWithLifecycle()
     val detailsUiState by viewModel.movieDetail.collectAsStateWithLifecycle()
     val movieImages: ImagesData? by viewModel.movieImages.collectAsStateWithLifecycle()
     val accountState by viewModel.accountState.collectAsStateWithLifecycle()
+    val mediaListUiState by viewModel.mediaListUiState.collectAsStateWithLifecycle()
+    val addListState by viewModel.addListState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(config.userData?.sessionId) {
+    LaunchedEffect(config.userData) {
         val sessionId = config.userData?.sessionId
         if (!sessionId.isNullOrEmpty()) {
             viewModel.requestAccountState(sessionId)
         }
+    }
+
+    LaunchedEffect(mediaListUiState) {
+        if (mediaListUiState is MediaListUiState.Success) {
+            showMediaListBottomSheet = true
+        }
+    }
+
+    LaunchedEffect(addListState) {
+        when (addListState) {
+            is AddListUiState.Error -> {
+                val message = if ((addListState as AddListUiState.Error).errorType == 1) {
+                    context.getString(R.string.key_media_already_in_list)
+                } else {
+                    context.getString(R.string.key_add_list_error)
+                }
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                viewModel.resetAddListState()
+            }
+
+            AddListUiState.Idle -> {}
+            AddListUiState.Success -> {
+                Toast.makeText(context, context.getString(R.string.key_add_list_success), Toast.LENGTH_SHORT).show()
+                showMediaListBottomSheet = false
+                viewModel.resetAddListState()
+            }
+        }
+
+    }
+
+    if (showMediaListBottomSheet && mediaListUiState is MediaListUiState.Success) {
+        MediaListBottomSheet(
+            onDismiss = { showMediaListBottomSheet = false },
+            mediaList = (mediaListUiState as MediaListUiState.Success).mediaList,
+            onMediaListClick = { mediaList ->
+                if (!config.isLogin()) {
+                    toLogin()
+                    return@MediaListBottomSheet
+                }
+                val sessionId = config.userData?.sessionId ?: ""
+                viewModel.toggleAddMediaToList(sessionId, mediaId, mediaList.id)
+            },
+            onCreateList = {
+
+            }
+        )
     }
 
     MovieDetailScreen(
@@ -104,6 +159,10 @@ fun MovieDetailRoute(
         onMoreImages = { id, type -> },
         onPeopleDetail = onNavigateToPeopleDetail,
         onFavorite = {
+            if (!config.isLogin()) {
+                toLogin()
+                return@MovieDetailScreen
+            }
             val favorite = accountState?.favorite ?: false
             val sessionId = config.userData?.sessionId
             val accountId = config.userData?.id
@@ -112,6 +171,10 @@ fun MovieDetailRoute(
             }
         },
         onWatchlist = {
+            if (!config.isLogin()) {
+                toLogin()
+                return@MovieDetailScreen
+            }
             val watchlist = accountState?.watchlist ?: false
             val sessionId = config.userData?.sessionId
             val accountId = config.userData?.id
@@ -119,7 +182,16 @@ fun MovieDetailRoute(
                 viewModel.toggleWatchlist(accountId, sessionId, !watchlist)
             }
         },
-        onAddList = { },
+        onAddList = {
+            if (!config.isLogin()) {
+                toLogin()
+                return@MovieDetailScreen
+            }
+            val accountId = config.userData?.id
+            if (accountId != null) {
+                viewModel.toggleGetMediaList(accountId)
+            }
+        },
         onShare = {
             shareTMDBMedia(context, mediaId, mediaType)
         },

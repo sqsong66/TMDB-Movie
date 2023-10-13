@@ -1,4 +1,4 @@
-package com.tmdb.movie.ui
+package com.tmdb.movie.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,7 +9,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -17,8 +16,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.tmdb.movie.data.DarkThemeType
-import com.tmdb.movie.ui.MainActivityUiState.Loading
-import com.tmdb.movie.ui.MainActivityUiState.Success
+import com.tmdb.movie.ui.main.vm.MainActivityUiState
+import com.tmdb.movie.ui.main.vm.MainActivityUiState.Loading
+import com.tmdb.movie.ui.main.vm.MainActivityUiState.Success
+import com.tmdb.movie.ui.main.vm.MainViewModel
 import com.tmdb.movie.ui.app.TMDBApp
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 import com.tmdb.movie.utils.monitor.NetworkMonitor

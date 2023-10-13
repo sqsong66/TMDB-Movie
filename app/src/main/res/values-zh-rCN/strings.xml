@@ -83,4 +83,14 @@
     <string name="key_remove_from_watchlist">移出观看列表</string>
     <string name="key_share">分享</string>
     <string name="key_add_to_list">添加到列表</string>
+    <string name="key_my_lists">我的列表</string>
+    <string name="key_create_list">创建列表</string>
+    <string name="key_no_lists">您还没有电影列表</string>
+    <string name="key_no_list_hint">您可以通过上面的\"创建列表\"按钮来创建新的列表</string>
+    <string name="key_login_tips">登录提示</string>
+    <string name="key_login_tips_content">您还未进行授权登录，暂时无法进行该操作！</string>
+    <string name="key_to_login">去登录</string>
+    <string name="key_add_list_success">已添加到列表</string>
+    <string name="key_add_list_error">添加至列表失败</string>
+    <string name="key_media_already_in_list">已存在该列表</string>
 </resources>

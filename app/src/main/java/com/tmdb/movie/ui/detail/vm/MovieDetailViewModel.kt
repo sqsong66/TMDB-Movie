@@ -7,9 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.FavoriteParam
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.TMDBConfig
+import com.tmdb.movie.network.TMDBNetworkException
 import com.tmdb.movie.repository.IMovieRepository
 import com.tmdb.movie.ui.detail.MovieArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +25,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -33,16 +34,18 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieDetailViewModel @Inject constructor(
     repository: IMovieRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val movieId: Int = MovieArgs(savedStateHandle).movieId
-    private val movieType: Int = MovieArgs(savedStateHandle).type
+    private val mediaType: Int = MovieArgs(savedStateHandle).type
+    private val mediaId: Int = MovieArgs(savedStateHandle).movieId
+    private val triggerMediaListChannel = Channel<Int>(Channel.CONFLATED)
+    private val triggerImagesChannel = Channel<Boolean>(Channel.CONFLATED)
+    private val triggerDetailsChannel = Channel<Boolean>(Channel.CONFLATED)
+    private val triggerAccountStateChannel = Channel<String>(Channel.CONFLATED)
     private val triggerFavoriteChannel = Channel<FavoriteParam>(Channel.CONFLATED)
     private val triggerWatchlistChannel = Channel<FavoriteParam>(Channel.CONFLATED)
-    private val triggerDetailsChannel = Channel<Boolean>(Channel.CONFLATED)
-    private val triggerImagesChannel = Channel<Boolean>(Channel.CONFLATED)
-    private val triggerAccountStateChannel = Channel<String>(Channel.CONFLATED)
+    private val triggerAddListChannel = Channel<AddListParam>(Channel.CONFLATED)
 
     private var _accountState = MutableStateFlow<AccountState?>(null)
     val accountState: StateFlow<AccountState?> = _accountState.stateIn(
@@ -51,11 +54,18 @@ class MovieDetailViewModel @Inject constructor(
         initialValue = null,
     )
 
+    private var _addListState = MutableStateFlow<AddListUiState>(AddListUiState.Idle)
+    val addListState: StateFlow<AddListUiState> = _addListState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = AddListUiState.Idle,
+    )
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val accountStateTrigger = triggerAccountStateChannel.receiveAsFlow()
         .filter { it.isNotEmpty() }
         .flatMapLatest { sessionId ->
-            repository.getAccountState(movieId, sessionId, movieType)
+            repository.getAccountState(mediaId, sessionId, mediaType)
         }.map { result ->
             when (result) {
                 is Result.Success -> {
@@ -71,10 +81,6 @@ class MovieDetailViewModel @Inject constructor(
         }
         .onEach {
             _accountState.value = it
-            Log.e("sqsong", "accountStateTrigger onEach: $it")
-        }
-        .onCompletion {
-            Log.e("sqsong", "accountStateTrigger onCompletion: $it")
         }
         .stateIn(
             scope = viewModelScope,
@@ -85,7 +91,7 @@ class MovieDetailViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val favoriteStateTrigger = triggerFavoriteChannel.receiveAsFlow()
         .flatMapLatest {
-            repository.markAsFavorite(it.accountId, it.sessionId, movieType, movieId, it.favorite)
+            repository.markAsFavorite(it.accountId, it.sessionId, mediaType, mediaId, it.favorite)
         }.map {
             when (it) {
                 is Result.Success -> {
@@ -112,7 +118,7 @@ class MovieDetailViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val watchlistStateTrigger = triggerWatchlistChannel.receiveAsFlow()
         .flatMapLatest {
-            repository.addToWatchlist(it.accountId, it.sessionId, movieType, movieId, it.favorite)
+            repository.addToWatchlist(it.accountId, it.sessionId, mediaType, mediaId, it.favorite)
         }.map {
             when (it) {
                 is Result.Success -> {
@@ -136,6 +142,68 @@ class MovieDetailViewModel @Inject constructor(
             initialValue = null,
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val mediaListUiState: StateFlow<MediaListUiState> = triggerMediaListChannel.receiveAsFlow()
+        .flatMapLatest { repository.getAccountMediaLists(it) }
+        .map {
+            when (it) {
+                is Result.Success -> {
+                    MediaListUiState.Success(it.data)
+                }
+
+                is Result.Error -> MediaListUiState.Error(it.exception?.message ?: "Unknown error")
+
+                Result.Loading -> MediaListUiState.Idle
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = MediaListUiState.Idle,
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val addListTrigger: StateFlow<AddListUiState> = triggerAddListChannel.receiveAsFlow()
+        .flatMapLatest {
+            repository.addMediaToList(it.sessionId, it.mediaId, it.listId)
+        }.map {
+            when (it) {
+                is Result.Success -> {
+                    val result = it.data
+                    if (result.success) {
+                        AddListUiState.Success
+                    } else {
+                        AddListUiState.Error(0, result.statusMessage)
+                    }
+                }
+
+                is Result.Error -> {
+                    val exception = it.exception
+                    if (exception is TMDBNetworkException) {
+                        if (exception.errorCode == 8) {
+                            AddListUiState.Error(1, exception.message)
+                        } else {
+                            AddListUiState.Error(0, exception.message)
+                        }
+                    } else {
+                        AddListUiState.Error(0, it.exception?.message)
+                    }
+                }
+
+                Result.Loading -> AddListUiState.Idle
+            }
+        }
+        .onEach {
+            Log.e("sqsong", "addListTrigger onEach: $it")
+            _addListState.value = it
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AddListUiState.Idle,
+        )
+
+
     init {
         onRetry()
         // 订阅 accountState 状态
@@ -144,6 +212,8 @@ class MovieDetailViewModel @Inject constructor(
         favoriteStateTrigger.launchIn(viewModelScope)
         // 订阅 收藏 状态
         watchlistStateTrigger.launchIn(viewModelScope)
+        // 订阅 添加列表 状态
+        addListTrigger.launchIn(viewModelScope)
     }
 
     val configStream: StateFlow<TMDBConfig> = repository.configStream
@@ -153,16 +223,16 @@ class MovieDetailViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
         )
 
-    private val movieDetailsFlow: Flow<Result<MovieDetails>> = if (movieType == 0) {
-        repository.getMovieDetails(movieId)
+    private val movieDetailsFlow: Flow<Result<MovieDetails>> = if (mediaType == 0) {
+        repository.getMovieDetails(mediaId)
     } else {
-        repository.getTVDetails(movieId)
+        repository.getTVDetails(mediaId)
     }
 
-    private val imagesFlow: Flow<Result<ImagesData>> = if (movieType == 0) {
-        repository.getMovieImages(movieId)
+    private val imagesFlow: Flow<Result<ImagesData>> = if (mediaType == 0) {
+        repository.getMovieImages(mediaId)
     } else {
-        repository.getTVImages(movieId)
+        repository.getTVImages(mediaId)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -235,6 +305,22 @@ class MovieDetailViewModel @Inject constructor(
             triggerWatchlistChannel.trySend(FavoriteParam(accountId, sessionId, watchlist))
         }
     }
+
+    fun toggleGetMediaList(accountId: Int) {
+        viewModelScope.launch {
+            triggerMediaListChannel.trySend(accountId)
+        }
+    }
+
+    fun toggleAddMediaToList(sessionId: String, mediaId: Int, listId: Int) {
+        viewModelScope.launch {
+            triggerAddListChannel.trySend(AddListParam(sessionId, mediaId, listId))
+        }
+    }
+
+    fun resetAddListState() {
+        _addListState.value = AddListUiState.Idle
+    }
 }
 
 sealed class MovieDetailUiState {
@@ -242,3 +328,21 @@ sealed class MovieDetailUiState {
     data class Success(val movieDetails: MovieDetails) : MovieDetailUiState()
     data class Error(val message: String) : MovieDetailUiState()
 }
+
+sealed class MediaListUiState {
+    data class Success(val mediaList: List<MediaList>?) : MediaListUiState()
+    data class Error(val message: String) : MediaListUiState()
+    data object Idle : MediaListUiState()
+}
+
+sealed class AddListUiState {
+    data object Success : AddListUiState()
+    data class Error(val errorType: Int, val message: String?) : AddListUiState()
+    data object Idle : AddListUiState()
+}
+
+data class AddListParam(
+    val sessionId: String,
+    val mediaId: Int,
+    val listId: Int,
+)

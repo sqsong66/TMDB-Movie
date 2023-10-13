@@ -5,14 +5,17 @@ import androidx.datastore.core.DataStore
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.FavoriteRequest
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.MediaIdRequest
+import com.tmdb.movie.data.MediaList
+import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MovieItem
-import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.PeopleCredits
 import com.tmdb.movie.data.PeopleDetails
 import com.tmdb.movie.data.RequestToken
 import com.tmdb.movie.data.RequestTokenInfo
+import com.tmdb.movie.data.ResponseResult
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.Session
 import com.tmdb.movie.data.TMDBConfig
@@ -229,5 +232,16 @@ class TMDBMovieRepository @Inject constructor(
             if (!result.success) throw Exception("Change watchlist state error: ${result.statusMessage}.")
             emit(watchlist)
         }.asResult()
+
+    override fun getAccountMediaLists(accountId: Int): Flow<Result<List<MediaList>?>> = flow {
+        val mediaLists = apiService.getAccountMediaLists(accountId)
+        emit(mediaLists.results)
+    }.asResult()
+
+    override fun addMediaToList(sessionId: String, mediaId: Int, listId: Int): Flow<Result<ResponseResult>> {
+        return flow {
+            emit(apiService.addMediaToList(listId, sessionId, MediaIdRequest(mediaId)))
+        }.asResult()
+    }
 
 }

@@ -87,4 +87,14 @@
     <string name="key_remove_from_watchlist">Remove from Watchlist</string>
     <string name="key_share">Share</string>
     <string name="key_add_to_list">Add to List</string>
+    <string name="key_my_lists">My Lists</string>
+    <string name="key_create_list">Create List</string>
+    <string name="key_no_lists">No lists yet</string>
+    <string name="key_no_list_hint">You can create a list by clicking the \"Create List\" button</string>
+    <string name="key_login_tips">Login Tips</string>
+    <string name="key_login_tips_content">You have not logged in with authorization and this operation is temporarily unavailable!</string>
+    <string name="key_to_login">To Login</string>
+    <string name="key_add_list_success">Add list success</string>
+    <string name="key_add_list_error">Add list error</string>
+    <string name="key_media_already_in_list">The item already in the list.</string>
 </resources>

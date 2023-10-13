@@ -93,27 +93,13 @@ fun MovieBackdropLayout(
         eraseColor(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f).toArgb())
     }
 
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
-            .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
-            .error(BitmapDrawable(context.resources, placeholderBitmap))
-            .data(onBuildImage(movieDetails?.backdropPath, ImageType.BACKDROP))
-            .crossfade(true)
-            .build()
-    )
     Box(modifier = Modifier.fillMaxWidth()) {
-//        AsyncImage(
-//            modifier = Modifier.fillMaxWidth(),
-//            model = ImageRequest.Builder(LocalContext.current)
-//                .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
-//                .error(BitmapDrawable(context.resources, placeholderBitmap))
-//                .data(onBuildImage(movieDetails?.backdropPath, ImageType.BACKDROP)).crossfade(true).build(),
-//            contentScale = ContentScale.FillWidth,
-//            contentDescription = ""
-//        )
-        Image(
+        AsyncImage(
             modifier = Modifier.fillMaxWidth(),
-            painter = painter,
+            model = ImageRequest.Builder(LocalContext.current)
+                .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
+                .error(BitmapDrawable(context.resources, placeholderBitmap))
+                .data(onBuildImage(movieDetails?.backdropPath, ImageType.BACKDROP)).crossfade(true).build(),
             contentScale = ContentScale.FillWidth,
             contentDescription = ""
         )

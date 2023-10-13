@@ -44,16 +44,16 @@ fun AuthenticationDialog(
 
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val refreshState by viewModel.refreshState.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit, block = {
-        Log.e("sqsong", "AuthenticationDialog: LaunchedEffect: $uiState")
+        Log.e("sqsong", "LaunchedEffect Unit: $uiState")
         if (uiState is AuthenticationUiState.Loading) {
             viewModel.refresh()
         }
     })
 
     LaunchedEffect(uiState) {
+        Log.w("sqsong", "LaunchedEffect uiState: $uiState")
         if (uiState is AuthenticationUiState.Error) {
             Toast.makeText(context, context.getString(R.string.key_authorize_error), Toast.LENGTH_SHORT).show()
             onDismiss()

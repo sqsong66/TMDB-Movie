@@ -4,6 +4,8 @@ import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.BaseListData
 import com.tmdb.movie.data.FavoriteRequest
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.MediaIdRequest
+import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.People
@@ -156,4 +158,10 @@ interface ApiService {
 
     @POST("account/{account_id}/watchlist")
     suspend fun addToWatchlist(@Path("account_id") accountId: Int, @Body body: WatchlistRequest): ResponseResult
+
+    @GET("account/{account_id}/lists")
+    suspend fun getAccountMediaLists(@Path("account_id") accountId: Int): BaseListData<MediaList>
+
+    @POST("list/{list_id}/add_item")
+    suspend fun addMediaToList(@Path("list_id") listId: Int, @Query("session_id") sessionId: String, @Body body: MediaIdRequest): ResponseResult
 }

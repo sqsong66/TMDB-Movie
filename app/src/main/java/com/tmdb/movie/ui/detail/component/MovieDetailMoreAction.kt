@@ -64,7 +64,10 @@ fun MovieDetailMoreAction(
                         contentDescription = "",
                     )
                 },
-                onClick = onAddList,
+                onClick = {
+                    onAddList()
+                    showDropdownMenu = false
+                },
             )
             DropdownMenuItem(
                 text = { Text(text = stringResource(R.string.key_share)) },

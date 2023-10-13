@@ -1,9 +1,5 @@
 package com.tmdb.movie.ui.app
 
-import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -53,7 +49,8 @@ fun TMDBApp(
     appState: TMDBAppState = rememberTMDBAppState(networkMonitor)
 ) {
     Surface(
-        modifier = Modifier.navigationBarsPadding(), color = MaterialTheme.colorScheme.background
+        modifier = Modifier.navigationBarsPadding(),
+        color = MaterialTheme.colorScheme.background,
     ) {
         val context = LocalContext.current
         val snackbarHostState = remember { SnackbarHostState() }
@@ -109,17 +106,19 @@ fun TMDBApp(
                     .padding(paddingValues)
                     .consumeWindowInsets(paddingValues)
             ) {
-                TMDBNavHost(appState = appState, onShowToast = {
-                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                }, onShowBottomBar = {
-                    showBottomBar = it
-                }, onBackClick = {
-                    if (it) {
-                        isDelayShowBottomBar = true
-                    } else {
-                        appState.popBackStack()
-                    }
-                })
+                TMDBNavHost(
+                    appState = appState,
+                    onShowBottomBar = {
+                        showBottomBar = it
+                    },
+                    onBackClick = {
+                        if (it) {
+                            isDelayShowBottomBar = true
+                        } else {
+                            appState.popBackStack()
+                        }
+                    },
+                )
             }
         }
     }

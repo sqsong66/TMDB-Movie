@@ -1,5 +1,6 @@
 package com.tmdb.movie.ui.me
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -42,10 +44,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tmdb.movie.R
+import com.tmdb.movie.component.myiconpack.emptyDataVector
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.UserData
 import com.tmdb.movie.ui.me.component.MeAvatarBgComponent
-import com.tmdb.movie.ui.me.dialog.AuthenticationDialog
 import com.tmdb.movie.ui.me.dialog.SignOutConfirmDialog
 import com.tmdb.movie.ui.me.dialog.ThemeDialog
 import com.tmdb.movie.ui.me.vm.MeViewModel
@@ -53,6 +55,7 @@ import com.tmdb.movie.ui.theme.TMDBMovieTheme
 
 @Composable
 fun MeRoute(
+    toAuthorize: () -> Unit,
     viewModel: MeViewModel = hiltViewModel()
 ) {
 
@@ -62,19 +65,6 @@ fun MeRoute(
     val signOutState by viewModel.signOutState.collectAsStateWithLifecycle()
     var isShowThemeDialog by rememberSaveable { mutableStateOf(false) }
     var isShowSignOutDialog by rememberSaveable { mutableStateOf(false) }
-    val authorizeState by viewModel.authorizeState.collectAsStateWithLifecycle()
-    var isShowAuthenticationDialog by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(authorizeState) {
-        if (authorizeState.isNotEmpty()) {
-            if (authorizeState.startsWith("success")) {
-                Toast.makeText(context, context.getString(R.string.key_auth_success), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, context.getString(R.string.key_auth_error), Toast.LENGTH_SHORT).show()
-            }
-            viewModel.updateRequestToken("")
-        }
-    }
 
     LaunchedEffect(signOutState) {
         if (signOutState.isNotEmpty()) {
@@ -93,12 +83,6 @@ fun MeRoute(
         })
     }
 
-    if (isShowAuthenticationDialog) {
-        AuthenticationDialog(onGetUserData = viewModel::updateRequestToken, onDismiss = {
-            isShowAuthenticationDialog = false
-        })
-    }
-
     if (isShowSignOutDialog) {
         SignOutConfirmDialog(
             onDismiss = { isShowSignOutDialog = false },
@@ -111,8 +95,8 @@ fun MeRoute(
 
     MeScreen(config = configStream,
         onAvatarClick = {
-            if (configStream.userData != null) return@MeScreen
-            isShowAuthenticationDialog = true
+            if (configStream.isLogin()) return@MeScreen
+            toAuthorize()
         }, onChangeTheme = {
             isShowThemeDialog = true
         }, onSignOut = {
@@ -193,12 +177,15 @@ fun MeScreen(
                 Icon(
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
                     painter = painterResource(id = R.drawable.baseline_palette_24),
-                    contentDescription = "Theme"
+                    contentDescription = "Theme",
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     modifier = Modifier.padding(start = 16.dp),
                     text = stringResource(id = R.string.key_theme),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -218,30 +205,38 @@ fun MeScreen(
                     Icon(
                         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
                         painter = painterResource(id = R.drawable.baseline_logout_24),
-                        contentDescription = "Theme"
+                        contentDescription = "Sign Out",
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         modifier = Modifier.padding(start = 16.dp),
                         text = stringResource(id = R.string.key_sign_out),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     )
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
 
-            /*Image(
+            Image(
                 modifier = Modifier
                     .width(200.dp)
                     .padding(top = 60.dp)
-                    .align(Alignment.CenterHorizontally), imageVector = buildErrorVector(
-                    primaryColor = MaterialTheme.colorScheme.primary, backgroundColor = MaterialTheme.colorScheme.background
-                ), contentDescription = "", contentScale = ContentScale.FillWidth
-            )*/
+                    .align(Alignment.CenterHorizontally),
+                imageVector = emptyDataVector(
+                    primaryColor = MaterialTheme.colorScheme.primary,
+                    backgroundColor = MaterialTheme.colorScheme.background
+                ),
+                contentDescription = "",
+                contentScale = ContentScale.FillWidth
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun MeScreenPreview() {
     TMDBMovieTheme {

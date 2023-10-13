@@ -11,8 +11,8 @@ fun NavController.navigateToMe(navOptions: NavOptions? = null) {
     this.navigate(meNavigationRoute, navOptions)
 }
 
-fun NavGraphBuilder.meScreen(onShowToast: (String) -> Unit) {
+fun NavGraphBuilder.meScreen(toAuthorize: () -> Unit) {
     composable(route = meNavigationRoute) {
-        MeRoute()
+        MeRoute(toAuthorize = toAuthorize)
     }
 }

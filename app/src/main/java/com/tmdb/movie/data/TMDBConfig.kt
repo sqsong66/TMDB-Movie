@@ -115,6 +115,10 @@ data class TMDBConfig(
         return userData?.avatar?.tmdb?.avatarPath.isNullOrEmpty() && userData?.avatar?.gravatar?.hash.isNullOrEmpty()
     }
 
+    fun isLogin(): Boolean {
+        return userData != null
+    }
+
     override fun toString(): String {
         return "TMDBConfig(darkTheme=$darkTheme, useDynamicTheme=$useDynamicTheme, baseImageUrl=$baseImageUrl, backdropSizeList=$backdropSizeList, logoSizeList=$logoSizeList, posterSizeList=$posterSizeList, profileSizeList=$profileSizeList, stillSizeList=$stillSizeList, updateTime=$updateTime, userData=$userData)"
     }

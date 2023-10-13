@@ -1,11 +1,14 @@
-package com.tmdb.movie.ui.me.vm
+package com.tmdb.movie.ui.main.vm
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.repository.IMovieRepository
+import com.tmdb.movie.ui.main.vm.MainActivityUiState.Loading
+import com.tmdb.movie.ui.main.vm.MainActivityUiState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,28 +19,32 @@ import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 import javax.inject.Inject
 
-private const val SESSION_ID = "session_id"
+private const val REQUEST_TOKEN = "request_token"
 
 @HiltViewModel
-class MeViewModel @Inject constructor(
-    repository: IMovieRepository,
+class MainViewModel @Inject constructor(
+    movieRepository: IMovieRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val deleteSessionId = savedStateHandle.getStateFlow(SESSION_ID, "")
+    private val requestToken = savedStateHandle.getStateFlow(REQUEST_TOKEN, "")
 
-    val configStream = repository.configStream
+    val uiState = movieRepository.configStream
+        .map {
+            Log.w("sqsong", "TMDBConfig: $it")
+            Success(it)
+        }
         .stateIn(
             scope = viewModelScope,
+            initialValue = Loading,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = TMDBConfig()
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val signOutState = deleteSessionId
+    val authorizeState = requestToken
         .flatMapLatest {
             if (it.isNotEmpty()) {
-                repository.signOut(it)
+                movieRepository.refreshUserData(it)
             } else {
                 flow { emit(Result.Loading) }
             }
@@ -55,7 +62,12 @@ class MeViewModel @Inject constructor(
             initialValue = ""
         )
 
-    fun signOut(sessionId: String) {
-        savedStateHandle[SESSION_ID] = sessionId
+    fun updateRequestToken(token: String) {
+        savedStateHandle[REQUEST_TOKEN] = token
     }
+}
+
+sealed interface MainActivityUiState {
+    data object Loading : MainActivityUiState
+    data class Success(val config: TMDBConfig) : MainActivityUiState
 }

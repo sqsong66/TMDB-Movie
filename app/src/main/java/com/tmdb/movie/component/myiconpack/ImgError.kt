@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 fun buildErrorVector(primaryColor: Color = Color(0xFF536DFE),
                      backgroundColor: Color = Color(0xFFFFFFFF)): ImageVector {
-    return ImageVector.Builder(
+    return Builder(
         name = "ImgError", defaultWidth = 1022.7.dp, defaultHeight = 785.81.dp,
         viewportWidth = 1022.7f, viewportHeight = 785.81f
     ).apply {
