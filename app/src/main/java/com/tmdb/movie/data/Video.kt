@@ -1,4 +1,5 @@
 package com.tmdb.movie.data
+
 import com.google.gson.annotations.SerializedName
 
 
@@ -23,4 +24,22 @@ data class Video(
     val size: Int = 0,
     @SerializedName("type")
     val type: String? = null
-)
+) {
+    private val youtubeUrl: String
+        get() = "https://www.youtube.com/watch?v=$key"
+
+    private val vimeoUrl: String
+        get() = "https://vimeo.com/$key"
+
+    fun getVideoUrl(): String {
+        return when (site) {
+            "YouTube" -> youtubeUrl
+            "Vimeo" -> vimeoUrl
+            else -> youtubeUrl
+        }
+    }
+
+    fun isYoutube(): Boolean {
+        return site == "YouTube"
+    }
+}

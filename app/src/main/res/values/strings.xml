@@ -97,4 +97,15 @@
     <string name="key_add_list_success">Add list success</string>
     <string name="key_add_list_error">Add list error</string>
     <string name="key_media_already_in_list">The item already in the list.</string>
+    <string name="key_create">Create</string>
+    <string name="key_name">Name</string>
+    <string name="key_list_name">List name</string>
+    <string name="key_description">Description</string>
+    <string name="key_list_description">List description</string>
+    <string name="key_list_name_exceeds_maximum">List name exceeds maximum length</string>
+    <string name="key_list_description_exceeds_maximum">List description exceeds maximum length</string>
+    <string name="key_create_list_success">Create list success</string>
+    <string name="key_create_list_failed">Create list failed</string>
+    <string name="key_no_videos">No Videos</string>
+    <string name="key_casts">Casts</string>
 </resources>

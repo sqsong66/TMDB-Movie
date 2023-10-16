@@ -93,4 +93,15 @@
     <string name="key_add_list_success">已添加到列表</string>
     <string name="key_add_list_error">添加至列表失败</string>
     <string name="key_media_already_in_list">已存在该列表</string>
+    <string name="key_create">创建</string>
+    <string name="key_name">名称</string>
+    <string name="key_list_name">列表名称</string>
+    <string name="key_description">描述</string>
+    <string name="key_list_description">列表描述</string>
+    <string name="key_list_name_exceeds_maximum">列表名称长度超过最大限制</string>
+    <string name="key_list_description_exceeds_maximum">列表描述长度超过最大限制</string>
+    <string name="key_create_list_success">列表创建成功</string>
+    <string name="key_create_list_failed">列表创建失败</string>
+    <string name="key_no_videos">没有视频</string>
+    <string name="key_casts">演员列表</string>
 </resources>

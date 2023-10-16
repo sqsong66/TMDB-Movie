@@ -17,18 +17,19 @@ fun getLanguage(): String {
     }
 }
 
-fun playYoutubeVideo(context: Context, videoKey: String?) {
+fun playMediaVideo(context: Context, videoKey: String?, isYouTuBe: Boolean = true) {
     if (videoKey.isNullOrEmpty()) return
-    val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoKey"))
-    try {
-        context.startActivity(appIntent)
-    } catch (ex: ActivityNotFoundException) {
-        val webIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("http://www.youtube.com/watch?v=$videoKey")
-        )
-        context.startActivity(webIntent)
+    if (isYouTuBe) {
+        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoKey"))
+        try {
+            context.startActivity(appIntent)
+        } catch (ex: ActivityNotFoundException) {
+            launchUrl(context = context, url = "http://www.youtube.com/watch?v=$videoKey")
+        }
+    } else {
+        launchUrl(context = context, url = "https://vimeo.com/$videoKey")
     }
+
 }
 
 fun launchUrl(context: Context, url: String?) {

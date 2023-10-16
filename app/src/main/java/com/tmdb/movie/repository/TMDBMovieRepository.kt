@@ -3,6 +3,7 @@ package com.tmdb.movie.repository
 import android.util.Log
 import androidx.datastore.core.DataStore
 import com.tmdb.movie.data.AccountState
+import com.tmdb.movie.data.CreateListParam
 import com.tmdb.movie.data.FavoriteRequest
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaIdRequest
@@ -241,6 +242,13 @@ class TMDBMovieRepository @Inject constructor(
     override fun addMediaToList(sessionId: String, mediaId: Int, listId: Int): Flow<Result<ResponseResult>> {
         return flow {
             emit(apiService.addMediaToList(listId, sessionId, MediaIdRequest(mediaId)))
+        }.asResult()
+    }
+
+    override fun createList(sessionId: String, param: CreateListParam): Flow<Result<Boolean>> {
+        return flow {
+            val result = apiService.createList(sessionId, param)
+            emit(result.success)
         }.asResult()
     }
 

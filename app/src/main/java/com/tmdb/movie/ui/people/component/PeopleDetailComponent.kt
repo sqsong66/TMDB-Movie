@@ -27,11 +27,14 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -242,6 +245,7 @@ fun PeopleCastComponent(
     val context = LocalContext.current
     val date = peopleCast.getDate()
     val monthDay = peopleCast.getNiceMonthDay()
+    var isImageError by rememberSaveable { mutableStateOf(false) }
     val placeholderBitmap = AppCompatResources.getDrawable(context, R.drawable.poster)?.toBitmap()?.apply {
         eraseColor(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f).toArgb())
     }
@@ -253,6 +257,9 @@ fun PeopleCastComponent(
             .data(onBuildImage(peopleCast.posterPath, ImageType.POSTER))
             .crossfade(true)
             .size(Size.ORIGINAL)
+            .listener(onError = { _, _ ->
+                isImageError = true
+            })
             .build()
     )
 
@@ -348,16 +355,28 @@ fun PeopleCastComponent(
                         contentScale = ContentScale.FillWidth
                     )
                 } else {
-                    Image(
-                        modifier = Modifier
-                            .width(100.dp)
-                            .padding(top = if (monthDay.isEmpty()) 16.dp else 8.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable { toMovieDetail(peopleCast.id, peopleCast.getMovieType()) },
-                        painter = painter,
-                        contentDescription = "",
-                        contentScale = ContentScale.FillWidth
-                    )
+                    Box(modifier = Modifier
+                        .width(100.dp)
+                        .padding(top = if (monthDay.isEmpty()) 16.dp else 8.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable { toMovieDetail(peopleCast.id, peopleCast.getMovieType()) }) {
+                        Image(
+                            modifier = Modifier,
+                            painter = painter,
+                            contentDescription = "",
+                            contentScale = ContentScale.FillWidth,
+                        )
+                        if (isImageError) {
+                            Image(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .align(Alignment.Center),
+                                painter = painterResource(id = R.drawable.baseline_broken_image),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
+                            )
+                        }
+                    }
                 }
                 Column(
                     modifier = Modifier

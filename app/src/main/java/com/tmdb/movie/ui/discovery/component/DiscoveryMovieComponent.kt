@@ -62,8 +62,7 @@ fun DiscoveryMovieListComponent(
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item { Spacer(modifier = Modifier.height(topHeight + 8.dp)) }
-        items(movieList?.itemCount ?: 0,
-            key = { movieList?.get(it)?.id ?: 0 }) { index ->
+        items(movieList?.itemCount ?: 0) { index ->
             DiscoveryMovieComponent(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 movieItem = movieList?.get(index),
@@ -85,12 +84,6 @@ fun DiscoveryMovieListComponent(
                 }
             }
 
-            else -> {}
-        }
-
-        when (movieList?.loadState?.append) {
-            is LoadState.Error -> item { LoadingError { movieList.retry() } }
-            LoadState.Loading -> item { LoadingFooter() }
             else -> {}
         }
 

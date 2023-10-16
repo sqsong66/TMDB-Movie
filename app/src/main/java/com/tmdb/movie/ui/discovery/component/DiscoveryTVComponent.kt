@@ -69,8 +69,7 @@ fun DiscoveryTVListComponent(
                 GridItemSpan(2)
             }
         ) { Spacer(modifier = Modifier.height(topHeight + 8.dp)) }
-        items(movieList?.itemCount ?: 0,
-            key = { movieList?.get(it)?.id ?: 0 }) { index ->
+        items(movieList?.itemCount ?: 0) { index ->
             DiscoveryTVComponent(
                 modifier = Modifier.padding(
                     start = if (index % 2 == 0) 16.dp else 8.dp,

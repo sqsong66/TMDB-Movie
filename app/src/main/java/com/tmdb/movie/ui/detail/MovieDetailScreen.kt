@@ -50,6 +50,8 @@ import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
+import com.tmdb.movie.data.MovieImage
+import com.tmdb.movie.data.Video
 import com.tmdb.movie.ui.detail.component.MovieBackdropLayout
 import com.tmdb.movie.ui.detail.component.MovieCastLayout
 import com.tmdb.movie.ui.detail.component.MovieDetailImageComponent
@@ -58,13 +60,16 @@ import com.tmdb.movie.ui.detail.component.MovieDetailMoreAction
 import com.tmdb.movie.ui.detail.component.MovieMiddleLayout
 import com.tmdb.movie.ui.detail.component.MovieOverviewLayout
 import com.tmdb.movie.ui.detail.component.MovieVideoComponent
+import com.tmdb.movie.ui.detail.sheet.AllCastsBottomSheet
+import com.tmdb.movie.ui.detail.sheet.AllImagesBottomSheet
+import com.tmdb.movie.ui.detail.sheet.AllVideosBottomSheet
 import com.tmdb.movie.ui.detail.sheet.MediaListBottomSheet
 import com.tmdb.movie.ui.detail.vm.AddListUiState
 import com.tmdb.movie.ui.detail.vm.MediaListUiState
 import com.tmdb.movie.ui.detail.vm.MovieDetailUiState
 import com.tmdb.movie.ui.detail.vm.MovieDetailViewModel
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
-import com.tmdb.movie.utils.playYoutubeVideo
+import com.tmdb.movie.utils.playMediaVideo
 import com.tmdb.movie.utils.shareTMDBMedia
 
 @Composable
@@ -73,6 +78,7 @@ fun MovieDetailRoute(
     @MediaType mediaType: Int,
     movieFrom: Int,
     toLogin: () -> Unit,
+    onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
     viewModel: MovieDetailViewModel = hiltViewModel(),
@@ -80,13 +86,20 @@ fun MovieDetailRoute(
 
     BackHandler { onBackClick(movieFrom == 0) }
     val context = LocalContext.current
-    var showMediaListBottomSheet by remember { mutableStateOf(false) }
     val config by viewModel.configStream.collectAsStateWithLifecycle()
-    val detailsUiState by viewModel.movieDetail.collectAsStateWithLifecycle()
-    val movieImages: ImagesData? by viewModel.movieImages.collectAsStateWithLifecycle()
+    var imageType by remember { mutableIntStateOf(ImageType.BACKDROP) }
+    var showMediaListBottomSheet by remember { mutableStateOf(false) }
+    var showAllVideosBottomSheet by remember { mutableStateOf(false) }
+    var showAllImagesBottomSheet by remember { mutableStateOf(false) }
+    var showAllCastsBottomSheet by remember { mutableStateOf(false) }
+    var allVideos by remember { mutableStateOf<List<Video>>(emptyList()) }
+    var allImages by remember { mutableStateOf<List<MovieImage>>(emptyList()) }
+    var allCasts by remember { mutableStateOf<List<Cast>>(emptyList()) }
     val accountState by viewModel.accountState.collectAsStateWithLifecycle()
-    val mediaListUiState by viewModel.mediaListUiState.collectAsStateWithLifecycle()
     val addListState by viewModel.addListState.collectAsStateWithLifecycle()
+    val detailsUiState by viewModel.movieDetail.collectAsStateWithLifecycle()
+    val mediaListUiState by viewModel.mediaListUiState.collectAsStateWithLifecycle()
+    val movieImages: ImagesData? by viewModel.movieImages.collectAsStateWithLifecycle()
 
     LaunchedEffect(config.userData) {
         val sessionId = config.userData?.sessionId
@@ -136,8 +149,41 @@ fun MovieDetailRoute(
                 viewModel.toggleAddMediaToList(sessionId, mediaId, mediaList.id)
             },
             onCreateList = {
+                onCreateList()
+                showMediaListBottomSheet = false
+            },
+        )
+    }
 
-            }
+    if (showAllVideosBottomSheet) {
+        AllVideosBottomSheet(
+            videos = allVideos,
+            onVideoClick = { videoKey, isYouTuBe ->
+                playMediaVideo(context, videoKey, isYouTuBe)
+            },
+            onBottomSheetDismiss = { showAllVideosBottomSheet = false },
+        )
+    }
+
+    if (showAllImagesBottomSheet) {
+        AllImagesBottomSheet(
+            imageType = imageType,
+            images = allImages,
+            onBottomSheetDismiss = { showAllImagesBottomSheet = false },
+            onBuildImage = { url, type ->
+                config.buildImageUrl(type, url)
+            },
+        )
+    }
+
+    if (showAllCastsBottomSheet) {
+        AllCastsBottomSheet(
+            castList = allCasts,
+            onBottomSheetDismiss = { showAllCastsBottomSheet = false },
+            onPeopleDetail = onNavigateToPeopleDetail,
+            onBuildImage = { url, _ ->
+                config.buildImageUrl(ImageType.PROFILE, url)
+            },
         )
     }
 
@@ -150,13 +196,23 @@ fun MovieDetailRoute(
         onBuildImage = { url, type ->
             config.buildImageUrl(type, url)
         },
-        onVideoClick = { videoKey ->
-            playYoutubeVideo(context, videoKey)
+        onVideoClick = { videoKey, isYouTuBe ->
+            playMediaVideo(context, videoKey, isYouTuBe)
         },
         onRetry = viewModel::onRetry,
-        onMoreCasts = { },
-        onMoreVideos = { },
-        onMoreImages = { id, type -> },
+        onMoreCasts = {
+            allCasts = it
+            showAllCastsBottomSheet = true
+        },
+        onMoreVideos = {
+            allVideos = it
+            showAllVideosBottomSheet = true
+        },
+        onMoreImages = { type, images ->
+            imageType = type
+            allImages = images
+            showAllImagesBottomSheet = true
+        },
         onPeopleDetail = onNavigateToPeopleDetail,
         onFavorite = {
             if (!config.isLogin()) {
@@ -207,11 +263,11 @@ fun MovieDetailScreen(
     accountState: AccountState?,
     onBackClick: (Boolean) -> Unit,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    onVideoClick: (String?) -> Unit = {},
+    onVideoClick: (String?, Boolean) -> Unit = { _, _ -> },
     onRetry: () -> Unit = {},
-    onMoreCasts: (Int) -> Unit,
-    onMoreVideos: (Int) -> Unit,
-    onMoreImages: (Int, @ImageType Int) -> Unit,
+    onMoreCasts: (List<Cast>) -> Unit,
+    onMoreVideos: (List<Video>) -> Unit,
+    onMoreImages: (@ImageType Int, List<MovieImage>) -> Unit,
     onPeopleDetail: (Int) -> Unit,
     onFavorite: () -> Unit,
     onWatchlist: () -> Unit,
@@ -320,10 +376,10 @@ fun MovieDetailComponent(
     movieDetails: MovieDetails? = null,
     movieImages: ImagesData? = null,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    onVideoClick: (String?) -> Unit = {},
-    onMoreCasts: (Int) -> Unit,
-    onMoreVideos: (Int) -> Unit,
-    onMoreImages: (Int, @ImageType Int) -> Unit,
+    onVideoClick: (String?, Boolean) -> Unit = { _, _ -> },
+    onMoreCasts: (List<Cast>) -> Unit,
+    onMoreVideos: (List<Video>) -> Unit,
+    onMoreImages: (@ImageType Int, List<MovieImage>) -> Unit,
     onPeopleDetail: (Int) -> Unit,
 ) {
     Column(
@@ -351,7 +407,7 @@ fun MovieDetailComponent(
                 modifier = Modifier.padding(bottom = 24.dp),
                 castList = movieDetails.credits.cast,
                 onBuildImage = onBuildImage,
-                onMoreCasts = { onMoreCasts(movieDetails.id) },
+                onMoreCasts = onMoreCasts,
                 onPeopleDetail = onPeopleDetail
             )
         }
@@ -360,7 +416,7 @@ fun MovieDetailComponent(
                 modifier = Modifier.padding(bottom = 24.dp),
                 videos = movieDetails.videos.results,
                 onVideoClick = onVideoClick,
-                onMoreVideos = { onMoreVideos(movieDetails.id) }
+                onMoreVideos = onMoreVideos,
             )
         }
         if (movieImages?.backdrops?.isNotEmpty() == true) {
@@ -369,7 +425,7 @@ fun MovieDetailComponent(
                 imageList = movieImages.backdrops,
                 imageType = ImageType.BACKDROP,
                 onBuildImage = onBuildImage,
-                onMoreImages = { onMoreImages(movieDetails?.id ?: 0, ImageType.BACKDROP) }
+                onMoreImages = onMoreImages
             )
         }
         if (movieImages?.posters?.isNotEmpty() == true) {
@@ -378,7 +434,7 @@ fun MovieDetailComponent(
                 imageList = movieImages.posters,
                 imageType = ImageType.POSTER,
                 onBuildImage = onBuildImage,
-                onMoreImages = { onMoreImages(movieDetails?.id ?: 0, ImageType.POSTER) }
+                onMoreImages = onMoreImages
             )
         }
     }
@@ -435,7 +491,7 @@ fun MovieDetailScreenPreview() {
             movieImages = null,
             onBackClick = {},
             onBuildImage = { url, _ -> url },
-            onVideoClick = {},
+            onVideoClick = { _, _ -> },
             onRetry = {},
             onMoreCasts = {},
             onMoreVideos = {},

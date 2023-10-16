@@ -23,10 +23,13 @@ fun ProfileTitleComponent(
     showMoreText: Boolean = true,
     moreText: String = "",
     onMoreTextClick: () -> Unit,
+    leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (leadingIcon != null) leadingIcon()
         Text(
             text = title,
             modifier = Modifier
@@ -53,7 +56,6 @@ fun ProfileTitleComponent(
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                 )
-
             }
         }
     }

@@ -23,6 +23,8 @@ import com.tmdb.movie.ui.main.component.LoginTipsDialog
 import com.tmdb.movie.ui.main.vm.MainViewModel
 import com.tmdb.movie.ui.me.dialog.AuthenticationDialog
 import com.tmdb.movie.ui.me.meScreen
+import com.tmdb.movie.ui.media.createListScreen
+import com.tmdb.movie.ui.media.navigateToCreateList
 import com.tmdb.movie.ui.people.navigateToPeopleDetail
 import com.tmdb.movie.ui.people.peopleDetailScreen
 import kotlinx.coroutines.delay
@@ -112,6 +114,9 @@ fun TMDBNavHost(
                     },
                     toLogin = {
                         showLoginTipsDialog = true
+                    },
+                    onCreateList = {
+                        navController.navigateToCreateList()
                     }
                 )
             })
@@ -123,5 +128,6 @@ fun TMDBNavHost(
         peopleDetailScreen(onBackClick = onBackClick, toMovieDetail = { movieId, type ->
             navController.navigateToMovieDetail(movieId, type, from = 1)
         })
+        createListScreen(onBackClick = onBackClick)
     }
 }

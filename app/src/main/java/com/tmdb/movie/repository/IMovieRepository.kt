@@ -1,6 +1,7 @@
 package com.tmdb.movie.repository
 
 import com.tmdb.movie.data.AccountState
+import com.tmdb.movie.data.CreateListParam
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.data.MovieDetails
@@ -75,4 +76,6 @@ interface IMovieRepository {
     fun getAccountMediaLists(accountId: Int): Flow<Result<List<MediaList>?>>
 
     fun addMediaToList(sessionId: String, mediaId: Int, listId: Int): Flow<Result<ResponseResult>>
+
+    fun createList(sessionId: String, param: CreateListParam): Flow<Result<Boolean>>
 }

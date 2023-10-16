@@ -36,7 +36,7 @@ fun MovieDetailImageComponent(
     modifier: Modifier = Modifier,
     @ImageType imageType: Int,
     imageList: List<MovieImage>,
-    onMoreImages: (@ImageType Int) -> Unit = { _ -> },
+    onMoreImages: (@ImageType Int, List<MovieImage>) -> Unit = { _, _ -> },
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
 ) {
     val context = LocalContext.current
@@ -56,7 +56,7 @@ fun MovieDetailImageComponent(
             title = stringResource(if (imageType == ImageType.BACKDROP) R.string.key_backdrops else R.string.key_poster),
             showMoreText = imageList.size > 5,
             moreText = stringResource(R.string.key_view_all),
-            onMoreTextClick = { onMoreImages(imageType) }
+            onMoreTextClick = { onMoreImages(imageType, imageList) }
         )
 
         LazyRow(modifier = Modifier.padding(top = 10.dp)) {

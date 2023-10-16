@@ -30,6 +30,7 @@ fun NavController.navigateToMovieDetail(movieId: Int, type: Int = MediaType.MOVI
 
 fun NavGraphBuilder.movieDetailScreen(
     toLogin:() -> Unit,
+    onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
 ) {
@@ -56,6 +57,7 @@ fun NavGraphBuilder.movieDetailScreen(
             movieFrom = movieFrom,
             toLogin = toLogin,
             onBackClick = onBackClick,
+            onCreateList = onCreateList,
             onNavigateToPeopleDetail = onNavigateToPeopleDetail
         )
     }

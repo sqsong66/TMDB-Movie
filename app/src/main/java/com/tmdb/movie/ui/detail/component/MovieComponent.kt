@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.PlaceholderDefaults
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -74,8 +73,8 @@ import com.tmdb.movie.data.Cast
 import com.tmdb.movie.data.Credits
 import com.tmdb.movie.data.Genre
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MediaType
+import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.Video
 import com.tmdb.movie.ext.formatWithCommasAndDecimals
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
@@ -357,7 +356,7 @@ fun MovieCastLayout(
     modifier: Modifier = Modifier,
     castList: List<Cast>,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    onMoreCasts: () -> Unit,
+    onMoreCasts: (List<Cast>) -> Unit,
     onPeopleDetail: (Int) -> Unit,
 ) {
     val castSize = castList.size.coerceAtMost(10)
@@ -369,7 +368,7 @@ fun MovieCastLayout(
             title = stringResource(R.string.key_main_cast),
             showMoreText = castList.size > 10,
             moreText = stringResource(id = R.string.key_view_all),
-            onMoreTextClick = onMoreCasts
+            onMoreTextClick = { onMoreCasts(castList) }
         )
 
         LazyRow(modifier = Modifier.padding(top = 10.dp)) {
@@ -455,8 +454,9 @@ fun MainCastComponent(
 @Composable
 fun MovieVideoComponent(
     modifier: Modifier = Modifier,
-    onMoreVideos: () -> Unit,
-    videos: List<Video>, onVideoClick: (String?) -> Unit
+    onMoreVideos: (List<Video>) -> Unit,
+    videos: List<Video>,
+    onVideoClick: (String?, Boolean) -> Unit
 ) {
     val maxSize = videos.size.coerceAtMost(5)
     var currentPage by remember { mutableIntStateOf(0) }
@@ -474,7 +474,7 @@ fun MovieVideoComponent(
             title = stringResource(R.string.key_videos),
             showMoreText = videos.size > 5,
             moreText = stringResource(id = R.string.key_view_all),
-            onMoreTextClick = onMoreVideos
+            onMoreTextClick = { onMoreVideos(videos) }
         )
         HorizontalPager(
             modifier = Modifier.padding(top = 10.dp),
@@ -483,14 +483,18 @@ fun MovieVideoComponent(
             pageSpacing = 8.dp,
         ) { index ->
             VideoPagerComponent(
-                video = videos[index], onVideoClick = onVideoClick
+                video = videos[index],
+                onVideoClick = onVideoClick,
             )
         }
     }
 }
 
 @Composable
-fun VideoPagerComponent(video: Video, onVideoClick: (String?) -> Unit) {
+fun VideoPagerComponent(
+    video: Video,
+    onVideoClick: (String?, Boolean) -> Unit,
+) {
     val context = LocalContext.current
     val placeholderBitmap = AppCompatResources.getDrawable(context, R.drawable.image_placeholder_horizontal)?.toBitmap()?.apply {
         eraseColor(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f).toArgb())
@@ -503,7 +507,7 @@ fun VideoPagerComponent(video: Video, onVideoClick: (String?) -> Unit) {
                 .fillMaxWidth()
                 .height(180.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .clickable { onVideoClick(video.key) },
+                .clickable { onVideoClick(video.key, video.isYoutube()) },
             model = ImageRequest.Builder(LocalContext.current)
                 .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
                 .error(BitmapDrawable(context.resources, placeholderBitmap))
@@ -516,14 +520,15 @@ fun VideoPagerComponent(video: Video, onVideoClick: (String?) -> Unit) {
 
         Image(
             modifier = Modifier
-                .clip(CircleShape)
+                .size(width = 60.dp, height = 40.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(
                     color = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
                 )
-                .padding(8.dp),
-            painter = painterResource(id = R.drawable.baseline_video_play_24),
+                .padding(horizontal = 16.dp, vertical = if (video.isYoutube()) 6.dp else 10.dp),
+            painter = painterResource(id = if (video.isYoutube()) R.drawable.logo_youtube else R.drawable.logo_vimeo),
             contentDescription = "",
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
         )
     }
 }
