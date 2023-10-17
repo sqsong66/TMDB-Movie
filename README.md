@@ -68,7 +68,7 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 - [ ] ...
 
 ## ScreenShots
-<div align="center">
+<div align="left">
 <table>
   <tr>
     <td> 
@@ -133,3 +133,10 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 </div>
 
 ## Screen Video
+https://github.com/sqsong66/TMDB-Movie/assets/11425148/5e9cb590-6042-4444-a47f-9bfe6df9d67c
+
+## Thanks 
+[TMDB(The Movie Database)](https://www.themoviedb.org/)  
+[nowinandroid](https://github.com/android/nowinandroid)  
+[Jetpack Compose](https://developer.android.com/jetpack/compose)
+
