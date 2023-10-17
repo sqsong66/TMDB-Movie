@@ -30,7 +30,7 @@ android {
             useSupportLibrary = true
         }
 
-        resValue("string", "tmdb_api_key", properties.getProperty("TMDB_API_KEY"))
+        resValue("string", "tmdb_access_token", properties.getProperty("TMDB_ACCESS_TOKEN"))
     }
 
     signingConfigs {

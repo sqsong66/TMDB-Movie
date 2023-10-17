@@ -18,7 +18,7 @@ class TMDBNetworkInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val builder = chain.request().newBuilder()
-        val apiKey = context.resources.getString(R.string.tmdb_api_key)
+        val apiKey = context.resources.getString(R.string.tmdb_access_token)
         if (apiKey.isNotEmpty()) {
             builder.addHeader("Authorization", "Bearer $apiKey")
         }
