@@ -1,11 +1,20 @@
 <p align="center">
     <img width="256px" src="images/logo_circle.svg" />
 </p>
-<center><font size="20px"><strong>TMDB Movie</strong></font></center>
 
+</br>
+</br>
 
-Thanks for [TMDB(The Movie Database)](https://www.themoviedb.org/) provide the API. This APP base on the  [TMDB API](https://developer.themoviedb.org/docs) and follow Google's [Material Design3](https://m3.material.io/) specification. It's beautiful and support Dark/Light/Dynamic theme.
+<p align="center">
+  <strong>
+    An android movie APP base on 
+    <a href="https://developer.themoviedb.org/docs">TMDB API</a>
+  </strong>
+</p>
 
-The preview video:   
+<p align="center">
+    The <a href="https://github.com/sqsong66/TMDB-Movie">TMDB Movie</a> is my <a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a> learning project, and it's all code written by Kotlin Jetpack Compose.
+    Thanks for <a href="https://www.themoviedb.org/">TMDB</a>(The Movie Database) provide the API, this project backend interface is based on <a href="https://developer.themoviedb.org/docs">TMDB API</a>. 
+</p>
 
-https://github.com/sqsong66/TMDB-Movie/assets/11425148/32de6974-54ff-4c94-af0d-af5435ecfe33
+The APP design specifications follow Material Design3
