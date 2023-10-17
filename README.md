@@ -38,6 +38,13 @@
 
 The APP ui design specifications follow [Material Design3](https://m3.material.io/), it's beautiful and support Dark, Light and Dynamic theme(Android 12+).
 
+</br>
+
+> [!WARNING]
+> This app is just my learning demo project, not the TMDB offical project. It can only be used for learning and communication, please do not use it for other purposes.
+
+</br>
+
 ## Build and Run  
 1. Go to [TMDB offical website](https://www.themoviedb.org/settings/api) register an account and apply to obtain Access Token.
 2. In the project root directory, create `local.properties` file(if the file does not exist), put the access in it.
