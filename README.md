@@ -36,4 +36,4 @@
 </table>
 </div>
 
-The APP ui design specifications follow [Material Design3](https://m3.material.io/).
+The APP ui design specifications follow [Material Design3](https://m3.material.io/), It's beautiful and support Dark/Light/Dynamic theme(Android 12+).
