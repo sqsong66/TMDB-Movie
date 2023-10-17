@@ -218,19 +218,6 @@ fun MeScreen(
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
-
-            Image(
-                modifier = Modifier
-                    .width(200.dp)
-                    .padding(top = 60.dp)
-                    .align(Alignment.CenterHorizontally),
-                imageVector = emptyDataVector(
-                    primaryColor = MaterialTheme.colorScheme.primary,
-                    backgroundColor = MaterialTheme.colorScheme.background
-                ),
-                contentDescription = "",
-                contentScale = ContentScale.FillWidth
-            )
         }
     }
 }

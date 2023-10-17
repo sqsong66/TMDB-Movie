@@ -217,7 +217,7 @@ fun CastItemComponent(
             ) {
                 Text(
                     modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 4.dp),
                     text = cast.name ?: "",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -239,13 +239,13 @@ fun PreviewAllCastsBottomSheet() {
             castList = listOf(
                 Cast(
                     id = 1,
-                    name = "namenamenamenamenamenamenamename",
+                    name = "name",
                     profilePath = "",
                     character = "character",
                 ),
                 Cast(
                     id = 1,
-                    name = "namenamenamenamenamenamenamename",
+                    name = "name",
                     profilePath = "",
                     character = "character",
                 ),
