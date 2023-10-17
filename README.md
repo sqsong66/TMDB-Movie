@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="256px" height="256px" src="images/logo_rounded.svg" />
+    <img width="256px" height="256px" src="images/logo_circle.svg" />
 </p>
 <p align="center" style="text-align: center; font-size: 58px"><strong>TMDB Movie</strong></p>
 
