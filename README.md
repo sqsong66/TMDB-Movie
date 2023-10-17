@@ -68,4 +68,68 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 - [ ] ...
 
 ## ScreenShots
+<div align="center">
+<table>
+  <tr>
+    <td> 
+      <p align="center">
+      <img alt="Discovery Movies" width="300" src="images/1.png" /> <br>
+      <em>Discovery Movies(Light Mode)</em>
+      </p>
+    </td>
+    <td> 
+      <p align="center">
+      <img alt="Discovery TVs" width="300" src="images/2.png" /> <br>
+      <em>Discovery TVs(Light Mode)</em>
+      </p>
+    </td>
+  </tr>
 
+  <tr>
+    <td> 
+      <p align="center">
+      <img alt="Theme Setting" width="300" src="images/3.png" /> <br>
+      <em>Theme Setting(Light Mode)</em>
+      </p>
+    </td>
+    <td> 
+      <p align="center">
+      <img alt="Theme Setting" width="300" src="images/4.png" /> <br>
+      <em>Theme Setting(Dark Mode)</em>
+      </p>
+    </td>
+  </tr>
+
+  <tr>
+    <td> 
+      <p align="center">
+      <img alt="Movie Details" width="300" src="images/5.png" /> <br>
+      <em>Movie Details(Light Mode)</em>
+      </p>
+    </td>
+    <td> 
+      <p align="center">
+      <img alt="Movie Details" width="300" src="images/6.png" /> <br>
+      <em>Movie Details(Light Mode)</em>
+      </p>
+    </td>
+  </tr>
+
+  <tr>
+    <td> 
+      <p align="center">
+      <img alt="People Details" width="300" src="images/7.png" /> <br>
+      <em>People Details(Dark Mode)</em>
+      </p>
+    </td>
+    <td> 
+      <p align="center">
+      <img alt="Actor's Acting" width="300" src="images/8.png" /> <br>
+      <em>Actor's Acting(Dark Mode)</em>
+      </p>
+    </td>
+  </tr>
+</table>
+</div>
+
+## Screen Video
