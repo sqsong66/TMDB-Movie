@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" />
+    <img width="256px" height="256px" src="images/logo_rounded.svg" />
 </p>
 <p align="center" style="text-align: center; font-size: 58px"><strong>TMDB Movie</strong></p>
 
