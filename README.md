@@ -36,6 +36,8 @@
 </table>
 </div>
 
+Chinese ducument see [中文文档](README_CN.md).
+
 The APP ui design specifications follow [Material Design3](https://m3.material.io/), it's beautiful and support Dark, Light and Dynamic theme(Android 12+).
 
 </br>
@@ -49,7 +51,7 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 1. Go to [TMDB offical website](https://www.themoviedb.org/settings/api) register an account and apply to obtain Access Token.
 2. In the project root directory, create `local.properties` file(if the file does not exist), put the access in it.
    ```
-   TMDB_ACCESS_TOKEN = YOU TMDB ACCESS TOKEN
+   TMDB_ACCESS_TOKEN = YOU_TMDB_ACCESS_TOKEN
    ```
 3. In this project I generate a release keystore to build released apk, you maybe dont't need it, you can delete app's `build.gradle.kts` `signingConfigs` configuration.
 4. Sync and run to build apk.
@@ -67,6 +69,7 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 - [x] Add movie, TV to list.
 - [x] Share movive, TV.
 - [x] Change theme.
+- [ ] Search movie, TV, people.
 - [ ] Rate movie, TV.
 - [ ] My list and list detials.
 - [ ] My watchlist movies, TVs.
@@ -147,3 +150,5 @@ https://github.com/sqsong66/TMDB-Movie/assets/11425148/5e9cb590-6042-4444-a47f-9
 [nowinandroid](https://github.com/android/nowinandroid)  
 [Jetpack Compose](https://developer.android.com/jetpack/compose)
 
+## LICENSE
+See [LICENSE](LICENSE)
