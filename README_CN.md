@@ -12,6 +12,14 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen?logo=github" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-Apache_2.0-blue" />
+  </a>
+  <img src="https://img.shields.io/badge/release-v1.0.0-green" />
+</p>
+
+<p align="center">
     <a href="https://github.com/sqsong66/TMDB-Movie">TMDB电影</a>是我个人用来学习<a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a>的一个Demo项目，项目代码采用Kotlin Jetpack Compose编写。项目接口采用的是 <a href="https://developer.themoviedb.org/docs">TMDB API</a>，感谢<a href="https://www.themoviedb.org/">TMDB</a>(The Movie Database) 提供的API接口。
 </p>
 

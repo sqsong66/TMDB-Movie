@@ -13,6 +13,14 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen?logo=github" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-Apache_2.0-blue" />
+  </a>
+  <img src="https://img.shields.io/badge/release-v1.0.0-green" />
+</p>
+
+<p align="center">
     The <a href="https://github.com/sqsong66/TMDB-Movie">TMDB Movie</a> is my <a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a> learning project, and it's all code written by Kotlin Jetpack Compose.
     Thanks for <a href="https://www.themoviedb.org/">TMDB</a>(The Movie Database) provide the API, this project backend interface is based on <a href="https://developer.themoviedb.org/docs">TMDB API</a>. 
 </p>
