@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -44,7 +43,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tmdb.movie.R
-import com.tmdb.movie.component.myiconpack.emptyDataVector
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.UserData
 import com.tmdb.movie.ui.me.component.MeAvatarBgComponent
@@ -102,9 +100,8 @@ fun MeRoute(
         }, onSignOut = {
             isShowSignOutDialog = true
         }, onBuildAvatar = {
-            val url = configStream.buildAvatarUrl(context)
-            avatarUrl = url
-            url
+            avatarUrl = configStream.buildAvatarUrl(context, true)
+            configStream.buildAvatarUrl(context)
         },
         avatarUrl = avatarUrl
     )
@@ -123,7 +120,8 @@ fun MeScreen(
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .placeholder(R.drawable.gravatar)
-            .error(R.drawable.gravatar).data(onBuildAvatar())
+            .error(R.drawable.gravatar)
+            .data(onBuildAvatar())
             .crossfade(true)
             .build()
     )

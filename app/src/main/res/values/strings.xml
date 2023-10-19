@@ -5,6 +5,7 @@
     <string name="key_youtube_video_preview_url" translatable="false">https://img.youtube.com/vi/%s/0.jpg</string>
     <string name="key_authentication_url" translatable="false">https://www.themoviedb.org/authenticate/%s</string>
     <string name="key_gravatar_url" translatable="false">https://secure.gravatar.com/avatar/%s.jpg?s=200</string>
+    <string name="key_gravatar_url_small" translatable="false">https://secure.gravatar.com/avatar/%s.jpg?s=92</string>
 
     <string name="key_home">Home</string>
     <string name="key_discovery">Discovery</string>

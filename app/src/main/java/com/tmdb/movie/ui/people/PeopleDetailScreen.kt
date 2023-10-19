@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.R
 import com.tmdb.movie.component.ErrorPage
+import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.PeopleCast
@@ -72,7 +73,7 @@ fun PeopleDetailRoute(
         peopleDetailUiState = peopleDetailUiState,
         peopleCredits = peopleCredits,
         onBackClick = { onBackClick(detailType == 0) },
-        onBuildImage = { url, type -> config.buildImageUrl(type, url) },
+        onBuildImage = { url, type, size -> config.buildImageUrl(type, url, size) },
         toMovieDetail = toMovieDetail
     )
 }
@@ -83,7 +84,7 @@ fun PeopleDetailScreen(
     peopleCredits: SortedPeopleCredits? = null,
     onBackClick: (Boolean) -> Unit,
     toMovieDetail: (Int, @MediaType Int) -> Unit,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
 ) {
     val scrollState = rememberScrollState()
     var imageUrl by remember { mutableStateOf("") }
@@ -100,13 +101,15 @@ fun PeopleDetailScreen(
             PeopleDetailUiState.Loading -> PeopleDetailLoadingPager(topBarHeight = topBarHeight)
             is PeopleDetailUiState.Success -> {
                 peopleName = peopleDetailUiState.data.name ?: ""
-                imageUrl = onBuildImage(peopleDetailUiState.data.profilePath, ImageType.PROFILE) ?: ""
+                imageUrl = onBuildImage(peopleDetailUiState.data.profilePath, ImageType.PROFILE, ImageSize.SMALL) ?: ""
                 PeopleDetailComponent(
                     topBarHeight = topBarHeight,
                     scrollState = scrollState,
                     peopleDetails = peopleDetailUiState.data,
                     peopleCredits = peopleCredits,
-                    onBuildImage = onBuildImage,
+                    onBuildImage = { url, type ->
+                        onBuildImage(url, type, ImageSize.MEDIUM)
+                    },
                     toMovieDetail = toMovieDetail
                 )
             }

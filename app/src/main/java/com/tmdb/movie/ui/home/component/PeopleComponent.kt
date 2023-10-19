@@ -1,6 +1,7 @@
 package com.tmdb.movie.ui.home.component
 
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,12 +41,15 @@ import com.google.accompanist.placeholder.material.shimmerHighlightColor
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
 import com.tmdb.movie.R
+import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.MediaType
+import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.ui.home.vm.MovieLoadState
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -54,7 +58,7 @@ fun HomeMoviePagerComponent(
     modifier: Modifier,
     moviePopularState: MovieLoadState<MovieItem>,
     onPageChanged: (String) -> Unit,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
     navigateToMovieDetail: (Int, @MediaType Int) -> Unit = { _, _ -> },
 ) {
     if (moviePopularState is MovieLoadState.Success) {
@@ -78,8 +82,9 @@ fun HomePagerComponent(
     modifier: Modifier,
     movieList: List<MovieItem>,
     onPageChanged: (String) -> Unit,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
     navigateToMovieDetail: (Int, @MediaType Int) -> Unit = { _, _ -> },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     val context = LocalContext.current
     val placeholderBitmap =
@@ -97,7 +102,7 @@ fun HomePagerComponent(
             .distinctUntilChanged()
             .collect { page ->
                 val movieItem = movieList[page % movieList.size]
-                onPageChanged(onBuildImage(movieItem.posterPath, ImageType.POSTER) ?: "")
+                onPageChanged(onBuildImage(movieItem.posterPath, ImageType.POSTER, ImageSize.SMALL) ?: "")
             }
     }
 
@@ -133,10 +138,18 @@ fun HomePagerComponent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { navigateToMovieDetail(movieItem.id, MediaType.MOVIE) },
+                    .clickable {
+                        if (pagerState.currentPage == page) {
+                            navigateToMovieDetail(movieItem.id, MediaType.MOVIE)
+                        } else {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(page)
+                            }
+                        }
+                    },
                 model = ImageRequest.Builder(LocalContext.current)
                     .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
-                    .data(onBuildImage(movieItem.posterPath, ImageType.POSTER))
+                    .data(onBuildImage(movieItem.posterPath, ImageType.POSTER, ImageSize.MEDIUM))
                     .crossfade(true)
                     .build(),
                 contentScale = ContentScale.FillWidth,

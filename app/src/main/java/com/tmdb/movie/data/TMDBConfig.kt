@@ -30,6 +30,17 @@ annotation class ImageType {
     }
 }
 
+@IntDef(ImageSize.SMALL, ImageSize.MEDIUM, ImageSize.LARGE)
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION, AnnotationTarget.TYPE)
+annotation class ImageSize {
+    companion object {
+        const val SMALL = 0
+        const val MEDIUM = 1
+        const val LARGE = 2
+    }
+}
+
 @Serializable
 data class TMDBConfig(
     @DarkThemeType
@@ -45,49 +56,89 @@ data class TMDBConfig(
     val userData: UserData? = null,
 ) {
 
-    fun buildImageUrl(@ImageType imageType: Int, imagePath: String?, isPreview: Boolean = true): String {
+    fun buildImageUrl(@ImageType imageType: Int, imagePath: String?, @ImageSize imageSize: Int = ImageSize.MEDIUM): String {
         return if (imagePath.isNullOrEmpty()) {
             ""
         } else {
             val baseUrl = baseImageUrl ?: return ""
-            val imageSize = when (imageType) {
+            val resultSize = when (imageType) {
                 ImageType.BACKDROP -> {
-                    if (isPreview) {
-                        backdropSizeList?.getOrNull(backdropSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
-                    } else {
-                        backdropSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                    when (imageSize) {
+                        ImageSize.SMALL -> {
+                            backdropSizeList?.getOrNull(0) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        ImageSize.MEDIUM -> {
+                            backdropSizeList?.getOrNull(backdropSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        else -> {
+                            backdropSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                        }
                     }
                 }
 
                 ImageType.LOGO -> {
-                    if (isPreview) {
-                        logoSizeList?.getOrNull(logoSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
-                    } else {
-                        logoSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                    when (imageSize) {
+                        ImageSize.SMALL -> {
+                            logoSizeList?.getOrNull(0) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        ImageSize.MEDIUM -> {
+                            logoSizeList?.getOrNull(logoSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        else -> {
+                            logoSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                        }
                     }
                 }
 
                 ImageType.POSTER -> {
-                    if (isPreview) {
-                        posterSizeList?.getOrNull(posterSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
-                    } else {
-                        posterSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                    when (imageSize) {
+                        ImageSize.SMALL -> {
+                            posterSizeList?.getOrNull(0) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        ImageSize.MEDIUM -> {
+                            posterSizeList?.getOrNull(posterSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        else -> {
+                            posterSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                        }
                     }
                 }
 
                 ImageType.PROFILE -> {
-                    if (isPreview) {
-                        profileSizeList?.getOrNull(profileSizeList.size - 1) ?: DEFAULT_IMAGE_SIZE
-                    } else {
-                        profileSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                    when (imageSize) {
+                        ImageSize.SMALL -> {
+                            profileSizeList?.getOrNull(0) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        ImageSize.MEDIUM -> {
+                            profileSizeList?.getOrNull(profileSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        else -> {
+                            profileSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                        }
                     }
                 }
 
                 ImageType.STILL -> {
-                    if (isPreview) {
-                        stillSizeList?.getOrNull(stillSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
-                    } else {
-                        stillSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                    when (imageSize) {
+                        ImageSize.SMALL -> {
+                            stillSizeList?.getOrNull(0) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        ImageSize.MEDIUM -> {
+                            stillSizeList?.getOrNull(stillSizeList.size - 2) ?: DEFAULT_IMAGE_SIZE
+                        }
+
+                        else -> {
+                            stillSizeList?.lastOrNull() ?: DEFAULT_IMAGE_SIZE
+                        }
                     }
                 }
 
@@ -95,18 +146,22 @@ data class TMDBConfig(
                     return ""
                 }
             }
-            "$baseUrl$imageSize$imagePath"
+            "$baseUrl$resultSize$imagePath"
         }
     }
 
-    fun buildAvatarUrl(context: Context): String {
+    fun buildAvatarUrl(context: Context, isSmall: Boolean = false): String {
         return userData?.let {
             val profileUrl = it.avatar?.tmdb?.avatarPath
             if (!profileUrl.isNullOrEmpty()) {
-                buildImageUrl(ImageType.PROFILE, profileUrl)
+                if (isSmall) {
+                    buildImageUrl(ImageType.PROFILE, profileUrl, ImageSize.SMALL)
+                } else {
+                    buildImageUrl(ImageType.PROFILE, profileUrl)
+                }
             } else {
                 val gravatarHash = it.avatar?.gravatar?.hash
-                String.format(context.getString(R.string.key_gravatar_url), gravatarHash)
+                String.format(context.getString(if (isSmall) R.string.key_gravatar_url_small else R.string.key_gravatar_url), gravatarHash)
             }
         } ?: ""
     }

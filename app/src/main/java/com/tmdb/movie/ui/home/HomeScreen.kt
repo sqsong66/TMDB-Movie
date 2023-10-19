@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.tmdb.movie.R
+import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieItem
@@ -120,8 +121,8 @@ fun HomeRoute(
             viewModel.changeSearchBarActiveState(it)
         },
         isRefreshing = moviesTrendingState is MovieLoadState.Loading,
-        onBuildImage = { url, type ->
-            config.buildImageUrl(type, url)
+        onBuildImage = { url, type, size ->
+            config.buildImageUrl(type, url, size)
         },
         navigateToMovieDetail = { id, type ->
             navigateToMovieDetail(id, type, 0)
@@ -157,7 +158,7 @@ fun HomeScreen(
     onActiveStateChanged: (Boolean) -> Unit = {},
     onRefreshData: () -> Unit = {},
     isRefreshing: Boolean = false,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
     navigateToMovieDetail: (Int, @MediaType Int) -> Unit = { _, _ -> },
     onNavigateToPeopleDetail: (Int) -> Unit = {},
     searchQuery: String = "",
@@ -182,6 +183,8 @@ fun HomeScreen(
     LaunchedEffect(key1 = isSearchBarActive, block = {
         searchBarActiveState = isSearchBarActive
     })
+
+    Log.w("sqsong", "HomeScreen: ReCompose")
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -223,7 +226,9 @@ fun HomeScreen(
             PopularPeopleComponent(
                 title = stringResource(R.string.key_popular_people),
                 trendingState = popularPeopleState,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 onNavigateToPeopleDetail = onNavigateToPeopleDetail
             )
             TrendingComponent(
@@ -231,7 +236,9 @@ fun HomeScreen(
                 mediaType = MediaType.TV,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
                 trendingState = tvPopularState,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 navigateToMovieDetail = navigateToMovieDetail
             )
             TrendingComponent(
@@ -239,7 +246,9 @@ fun HomeScreen(
                 mediaType = MediaType.MOVIE,
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                 trendingState = moviesTrendingState,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 navigateToMovieDetail = navigateToMovieDetail
             )
             TrendingComponent(
@@ -247,7 +256,9 @@ fun HomeScreen(
                 mediaType = MediaType.TV,
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                 trendingState = tvTrendingState,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 navigateToMovieDetail = navigateToMovieDetail
             )
             TrendingComponent(
@@ -255,7 +266,9 @@ fun HomeScreen(
                 mediaType = MediaType.MOVIE,
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                 trendingState = movieNowPlayingState,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 navigateToMovieDetail = navigateToMovieDetail
             )
             TrendingComponent(
@@ -263,7 +276,9 @@ fun HomeScreen(
                 mediaType = MediaType.TV,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
                 trendingState = tvAirTodayState,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 navigateToMovieDetail = navigateToMovieDetail
             )
             Spacer(modifier = Modifier.height(80.dp))
@@ -286,7 +301,9 @@ fun HomeScreen(
                 isSearchBarActive = isSearchBarActive,
                 recentSearchList = recentSearchList,
                 searchResult = searchResult,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 navigateToDetail = navigateToDetail
             )
             PullRefreshIndicator(
