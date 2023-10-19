@@ -48,8 +48,8 @@ import com.tmdb.movie.component.ErrorPage
 import com.tmdb.movie.component.LoadingError
 import com.tmdb.movie.component.LoadingFooter
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.MediaType
+import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 
 @Composable
@@ -114,6 +114,11 @@ fun DiscoveryTVListComponent(
             LoadState.Loading -> item { LoadingFooter() }
             else -> {}
         }
+        item(
+            span = {
+                GridItemSpan(2)
+            }
+        ) { Spacer(modifier = Modifier.height(80.dp)) }
     }
 }
 

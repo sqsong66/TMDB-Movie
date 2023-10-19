@@ -85,26 +85,17 @@ fun TMDBNavHost(
             onShowBottomBar = onShowBottomBar,
             navigateToMovieDetail = { id, type, from ->
                 onShowBottomBar(false)
-                appState.coroutineScope.launch {
-                    delay(300)
-                    navController.navigateToMovieDetail(id, type, from)
-                }
+                navController.navigateToMovieDetail(id, type, from)
             },
             onNavigateToPeopleDetail = { id, from ->
                 onShowBottomBar(false)
-                appState.coroutineScope.launch {
-                    delay(300)
-                    navController.navigateToPeopleDetail(id, from)
-                }
+                navController.navigateToPeopleDetail(id, from)
             },
         )
         discoveryScreen(
             navigateToDetail = { movieItem, type ->
                 onShowBottomBar(false)
-                appState.coroutineScope.launch {
-                    delay(300)
-                    navController.navigateToMovieDetail(movieItem?.id ?: 0, type)
-                }
+                navController.navigateToMovieDetail(movieItem?.id ?: 0, type)
             },
             nestedGraphs = {
                 movieDetailScreen(

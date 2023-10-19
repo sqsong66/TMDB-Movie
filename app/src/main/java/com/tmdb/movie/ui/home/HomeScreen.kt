@@ -66,8 +66,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.tmdb.movie.R
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.MediaType
+import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.SearchHistory
 import com.tmdb.movie.data.SearchItem
@@ -92,17 +92,17 @@ fun HomeRoute(
 ) {
 
     val config by viewModel.configStream.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val isSearchBarActive by viewModel.isSearchBarActive.collectAsStateWithLifecycle()
-    val moviesTrendingState by viewModel.movieTrendingState.collectAsStateWithLifecycle()
-    val tvTrendingState by viewModel.tvTrendingState.collectAsStateWithLifecycle()
-    val popularPeopleState by viewModel.popularPeopleState.collectAsStateWithLifecycle()
-    val movieNowPlayingState by viewModel.movieNowPlayingState.collectAsStateWithLifecycle()
-    val tvAirTodayState by viewModel.tvAirTodayState.collectAsStateWithLifecycle()
-    val moviePopularState by viewModel.moviePopularState.collectAsStateWithLifecycle()
-    val tvPopularState by viewModel.tvPopularState.collectAsStateWithLifecycle()
-    val recentSearchList by viewModel.recentSearchList.collectAsStateWithLifecycle()
     val searchResult = viewModel.searchResult.collectAsLazyPagingItems()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val tvPopularState by viewModel.tvPopularState.collectAsStateWithLifecycle()
+    val tvTrendingState by viewModel.tvTrendingState.collectAsStateWithLifecycle()
+    val tvAirTodayState by viewModel.tvAirTodayState.collectAsStateWithLifecycle()
+    val recentSearchList by viewModel.recentSearchList.collectAsStateWithLifecycle()
+    val isSearchBarActive by viewModel.isSearchBarActive.collectAsStateWithLifecycle()
+    val moviePopularState by viewModel.moviePopularState.collectAsStateWithLifecycle()
+    val popularPeopleState by viewModel.popularPeopleState.collectAsStateWithLifecycle()
+    val moviesTrendingState by viewModel.movieTrendingState.collectAsStateWithLifecycle()
+    val movieNowPlayingState by viewModel.movieNowPlayingState.collectAsStateWithLifecycle()
 
     HomeScreen(
         moviesTrendingState = moviesTrendingState,
@@ -266,6 +266,7 @@ fun HomeScreen(
                 onBuildImage = onBuildImage,
                 navigateToMovieDetail = navigateToMovieDetail
             )
+            Spacer(modifier = Modifier.height(80.dp))
         }
 
         Column(
