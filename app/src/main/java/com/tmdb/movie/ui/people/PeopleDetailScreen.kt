@@ -24,7 +24,9 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +53,7 @@ import com.tmdb.movie.ui.people.component.PeopleKnownForComponent
 import com.tmdb.movie.ui.people.vm.PeopleDetailUiState
 import com.tmdb.movie.ui.people.vm.PeopleDetailViewModel
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PeopleDetailRoute(
@@ -74,7 +77,6 @@ fun PeopleDetailRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PeopleDetailScreen(
     peopleDetailUiState: PeopleDetailUiState,
@@ -86,14 +88,7 @@ fun PeopleDetailScreen(
     val scrollState = rememberScrollState()
     var imageUrl by remember { mutableStateOf("") }
     var peopleName by remember { mutableStateOf("") }
-    var topBarAlpha by remember { mutableFloatStateOf(0f) }
     var topBarHeight by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(scrollState.value) {
-        val scrollValue = scrollState.value.toFloat()
-        val deltaY = scrollValue.coerceAtMost(topBarHeight.toFloat())
-        topBarAlpha = deltaY / topBarHeight.toFloat()
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         PeopleBgComponent(
@@ -116,34 +111,62 @@ fun PeopleDetailScreen(
                 )
             }
         }
-
-        TopAppBar(
+        PeopleDetailTopBar(
             modifier = Modifier.onGloballyPositioned {
                 topBarHeight = it.size.height
             },
-            title = {
-                Text(
-                    text = peopleName,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = topBarAlpha)
-                    )
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = {
-                    onBackClick(true)
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-                        contentDescription = ""
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
-            )
+            scrollState = scrollState,
+            peopleName = peopleName,
+            onBackClick = onBackClick
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PeopleDetailTopBar(
+    modifier: Modifier,
+    scrollState: ScrollState,
+    peopleName: String,
+    onBackClick: (Boolean) -> Unit,
+) {
+    var topBarHeight by rememberSaveable { mutableIntStateOf(0) }
+    var topBarAlpha by rememberSaveable { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(scrollState) {
+        snapshotFlow { scrollState.value }
+            .collectLatest { scrollValue ->
+                val deltaY = scrollValue.toFloat().coerceAtMost(topBarHeight.toFloat())
+                topBarAlpha = if (topBarHeight == 0) 0f else deltaY / topBarHeight.toFloat()
+            }
+    }
+
+    TopAppBar(
+        modifier = modifier.onGloballyPositioned {
+            topBarHeight = it.size.height
+        },
+        title = {
+            Text(
+                text = peopleName,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = topBarAlpha)
+                )
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                onBackClick(true)
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                    contentDescription = ""
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
+        )
+    )
 }
 
 @Composable

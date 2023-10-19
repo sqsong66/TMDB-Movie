@@ -103,6 +103,18 @@ interface ApiService {
         @Query("language") language: String = getLanguage(),
     ): PeopleCredits
 
+    @GET("person/{id}/movie_credits")
+    suspend fun getPeopleMovieCredits(
+        @Path("id") id: Int,
+        @Query("language") language: String = getLanguage(),
+    ): PeopleCredits
+
+    @GET("person/{id}/tv_credits")
+    suspend fun getPeopleTvCredits(
+        @Path("id") id: Int,
+        @Query("language") language: String = getLanguage(),
+    ): PeopleCredits
+
     @GET("search/multi")
     suspend fun search(
         @Query("query") query: String,

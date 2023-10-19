@@ -29,8 +29,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +74,13 @@ import com.tmdb.movie.ui.detail.vm.MovieDetailViewModel
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 import com.tmdb.movie.utils.playMediaVideo
 import com.tmdb.movie.utils.shareTMDBMedia
+import kotlinx.coroutines.flow.collectLatest
+
+private data class MovieDetailShowState(
+    val movieDetails: MovieDetails? = null,
+    val isLoading: Boolean = false,
+    val throwError: Boolean = false
+)
 
 @Composable
 fun MovieDetailRoute(
@@ -254,7 +264,6 @@ fun MovieDetailRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailScreen(
     @MediaType mediaType: Int,
@@ -274,20 +283,18 @@ fun MovieDetailScreen(
     onAddList: () -> Unit,
     onShare: () -> Unit,
 ) {
-
     val title = if (movieDetailUiState is MovieDetailUiState.Success) {
         movieDetailUiState.movieDetails.getMovieName(mediaType) ?: ""
     } else {
         ""
     }
-    val scrollState = rememberScrollState()
-    var topBarHeight by remember { mutableIntStateOf(0) }
-    var topBarAlpha by remember { mutableFloatStateOf(0f) }
 
-    LaunchedEffect(scrollState.value) {
-        val scrollValue = scrollState.value.toFloat()
-        val deltaY = scrollValue.coerceAtMost(topBarHeight.toFloat())
-        topBarAlpha = deltaY / topBarHeight.toFloat()
+    val showState by produceState(key1 = movieDetailUiState, initialValue = MovieDetailShowState(isLoading = true)) {
+        value = when (movieDetailUiState) {
+            is MovieDetailUiState.Error -> MovieDetailShowState(throwError = true)
+            MovieDetailUiState.Loading -> MovieDetailShowState(isLoading = true)
+            is MovieDetailUiState.Success -> MovieDetailShowState(movieDetailUiState.movieDetails)
+        }
     }
 
     Box(
@@ -295,86 +302,132 @@ fun MovieDetailScreen(
             .fillMaxSize()
             .navigationBarsPadding()
     ) {
+        val scrollState = rememberScrollState()
         AnimatedContent(
-            targetState = movieDetailUiState,
+            targetState = showState,
             label = "",
             transitionSpec = {
                 (fadeIn(animationSpec = tween(500)))
                     .togetherWith(fadeOut(animationSpec = tween(500)))
             }
         ) { targetState ->
-            when (targetState) {
-                is MovieDetailUiState.Error -> ErrorPage(onRetry = onRetry)
-                MovieDetailUiState.Loading -> MovieDetailLoadingComponent()
-                is MovieDetailUiState.Success -> MovieDetailComponent(
-                    mediaType = mediaType,
-                    movieDetails = targetState.movieDetails,
-                    movieImages = movieImages,
-                    onBuildImage = onBuildImage,
-                    onVideoClick = onVideoClick,
-                    scrollState = scrollState,
-                    onMoreCasts = onMoreCasts,
-                    onMoreVideos = onMoreVideos,
-                    onMoreImages = onMoreImages,
-                    onPeopleDetail = onPeopleDetail,
-                )
+            when {
+                targetState.movieDetails != null -> {
+                    MovieDetailComponent(
+                        mediaType = mediaType,
+                        movieDetails = targetState.movieDetails,
+                        movieImages = movieImages,
+                        onBuildImage = onBuildImage,
+                        onVideoClick = onVideoClick,
+                        onMoreCasts = onMoreCasts,
+                        onMoreVideos = onMoreVideos,
+                        onMoreImages = onMoreImages,
+                        onPeopleDetail = onPeopleDetail,
+                        scrollState = scrollState,
+                    )
+                }
+
+                targetState.throwError -> {
+                    ErrorPage(onRetry = onRetry)
+                }
+
+                else -> {
+                    MovieDetailLoadingComponent()
+                }
             }
         }
-        TopAppBar(
-            modifier = Modifier.onGloballyPositioned {
-                topBarHeight = it.size.height
-            },
-            title = {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = topBarAlpha
-                        )
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = {
-                    onBackClick(true)
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-                        contentDescription = ""
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = onFavorite) {
-                    Icon(
-                        painter = painterResource(id = if (accountState?.favorite == true) R.drawable.baseline_favorite_24 else R.drawable.outline_favorite_24),
-                        contentDescription = "",
-                        tint = if (accountState?.favorite == true) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                MovieDetailMoreAction(
-                    modifier = Modifier,
-                    accountState = accountState,
-                    onWatchlist = onWatchlist,
-                    onAddList = onAddList,
-                    onShare = onShare,
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
-            )
+        MovieDetailTopBar(
+            modifier = Modifier,
+            title = title,
+            scrollState = scrollState,
+            accountState = accountState,
+            onBackClick = onBackClick,
+            onFavorite = onFavorite,
+            onWatchlist = onWatchlist,
+            onAddList = onAddList,
+            onShare = onShare,
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MovieDetailTopBar(
+    modifier: Modifier,
+    title: String,
+    scrollState: ScrollState,
+    accountState: AccountState?,
+    onBackClick: (Boolean) -> Unit,
+    onFavorite: () -> Unit,
+    onWatchlist: () -> Unit,
+    onAddList: () -> Unit,
+    onShare: () -> Unit,
+) {
+    var topBarAlpha by rememberSaveable { mutableFloatStateOf(0f) }
+    var topBarHeight by rememberSaveable { mutableIntStateOf(0) }
+
+    LaunchedEffect(scrollState) {
+        snapshotFlow { scrollState.value }
+            .collectLatest { scrollValue ->
+                val deltaY = scrollValue.toFloat().coerceAtMost(topBarHeight.toFloat())
+                topBarAlpha = deltaY / topBarHeight.toFloat()
+            }
+    }
+
+    TopAppBar(
+        modifier = modifier.onGloballyPositioned {
+            topBarHeight = it.size.height
+        },
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = topBarAlpha
+                    )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                onBackClick(true)
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                    contentDescription = ""
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onFavorite) {
+                Icon(
+                    painter = painterResource(id = if (accountState?.favorite == true) R.drawable.baseline_favorite_24 else R.drawable.outline_favorite_24),
+                    contentDescription = "",
+                    tint = if (accountState?.favorite == true) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            MovieDetailMoreAction(
+                modifier = Modifier,
+                accountState = accountState,
+                onWatchlist = onWatchlist,
+                onAddList = onAddList,
+                onShare = onShare,
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
+        )
+    )
 }
 
 @Composable
 fun MovieDetailComponent(
     @MediaType mediaType: Int,
-    scrollState: ScrollState,
-    movieDetails: MovieDetails? = null,
     movieImages: ImagesData? = null,
+    movieDetails: MovieDetails? = null,
+    scrollState: ScrollState,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
     onVideoClick: (String?, Boolean) -> Unit = { _, _ -> },
     onMoreCasts: (List<Cast>) -> Unit,

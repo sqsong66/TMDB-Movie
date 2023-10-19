@@ -43,9 +43,9 @@ class MovieDetailViewModel @Inject constructor(
     private val triggerImagesChannel = Channel<Boolean>(Channel.CONFLATED)
     private val triggerDetailsChannel = Channel<Boolean>(Channel.CONFLATED)
     private val triggerAccountStateChannel = Channel<String>(Channel.CONFLATED)
+    private val triggerAddListChannel = Channel<AddListParam>(Channel.CONFLATED)
     private val triggerFavoriteChannel = Channel<FavoriteParam>(Channel.CONFLATED)
     private val triggerWatchlistChannel = Channel<FavoriteParam>(Channel.CONFLATED)
-    private val triggerAddListChannel = Channel<AddListParam>(Channel.CONFLATED)
 
     private var _accountState = MutableStateFlow<AccountState?>(null)
     val accountState: StateFlow<AccountState?> = _accountState.stateIn(

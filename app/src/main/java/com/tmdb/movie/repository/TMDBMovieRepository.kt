@@ -29,10 +29,12 @@ import com.tmdb.movie.paging.SearchMoviePagingSource
 import com.tmdb.movie.utils.BASE_TMDB_IMAGE_URL
 import com.tmdb.movie.utils.DEFAULT_IMAGE_SIZE
 import com.tmdb.movie.utils.formatLongToString
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.zip
 import javax.inject.Inject
 
 class TMDBMovieRepository @Inject constructor(
@@ -143,12 +145,12 @@ class TMDBMovieRepository @Inject constructor(
     override fun getDiscoveryMoviePagingSource(discoveryType: Int): DiscoveryMoviePagingSource = DiscoveryMoviePagingSource(apiService, discoveryType)
 
     override fun getMovieDetails(movieId: Int): Flow<Result<MovieDetails>> = flow {
-        // kotlinx.coroutines.delay(1000)
+        delay(1000)
         emit(apiService.getMovieDetails(movieId))
     }.asResult()
 
     override fun getTVDetails(id: Int): Flow<Result<MovieDetails>> = flow {
-        // kotlinx.coroutines.delay(1000)
+        delay(1000)
         emit(apiService.getTVDetails(id))
     }.asResult()
 
@@ -163,12 +165,29 @@ class TMDBMovieRepository @Inject constructor(
     }.asResult()
 
     override fun getPeopleDetails(id: Int): Flow<Result<PeopleDetails>> = flow {
-        kotlinx.coroutines.delay(2000)
+        delay(1000)
         emit(apiService.getPeopleDetails(id))
     }.asResult()
 
+//    override fun getPeopleCredits(id: Int, @MediaType mediaType: Int): Flow<Result<PeopleCredits>> = flow {
+//        val credits = if (mediaType == MediaType.MOVIE) {
+//            apiService.getPeopleMovieCredits(id)
+//        } else {
+//            apiService.getPeopleTvCredits(id)
+//        }
+//        emit(credits)
+//    }.asResult()
+
     override fun getPeopleCredits(id: Int): Flow<Result<PeopleCredits>> = flow {
-        emit(apiService.getPeopleCredits(id))
+        emit(apiService.getPeopleMovieCredits(id))
+    }.zip(flow {
+        emit(apiService.getPeopleTvCredits(id))
+    }) { movieCredits, tvCredits ->
+        val mCasts = movieCredits.cast?.map { it.copy(mediaType = "movie") } ?: emptyList()
+        val tCasts = tvCredits.cast?.map { it.copy(mediaType = "tv") } ?: emptyList()
+        val mCrews = movieCredits.crew?.map { it.copy(mediaType = "movie") } ?: emptyList()
+        val tCrews = tvCredits.crew?.map { it.copy(mediaType = "tv") } ?: emptyList()
+        PeopleCredits(mCasts + tCasts, mCrews + tCrews, id)
     }.asResult()
 
     override fun getSearchMoviePagingSource(query: String): SearchMoviePagingSource {
