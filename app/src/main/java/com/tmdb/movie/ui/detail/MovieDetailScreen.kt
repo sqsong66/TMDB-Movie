@@ -45,10 +45,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.R
 import com.tmdb.movie.component.ErrorPage
+import com.tmdb.movie.component.FullScreenPhoto
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.Cast
 import com.tmdb.movie.data.Credits
 import com.tmdb.movie.data.Genre
+import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaType
@@ -108,6 +110,7 @@ fun MovieDetailRoute(
     val accountState by viewModel.accountState.collectAsStateWithLifecycle()
     val addListState by viewModel.addListState.collectAsStateWithLifecycle()
     val detailsUiState by viewModel.movieDetail.collectAsStateWithLifecycle()
+    var previewImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
     val mediaListUiState by viewModel.mediaListUiState.collectAsStateWithLifecycle()
     val movieImages: ImagesData? by viewModel.movieImages.collectAsStateWithLifecycle()
 
@@ -203,8 +206,8 @@ fun MovieDetailRoute(
         movieImages = movieImages,
         accountState = accountState,
         onBackClick = { onBackClick(movieFrom == 0) },
-        onBuildImage = { url, type ->
-            config.buildImageUrl(type, url)
+        onBuildImage = { url, type, size ->
+            config.buildImageUrl(type, url, size)
         },
         onVideoClick = { videoKey, isYouTuBe ->
             playMediaVideo(context, videoKey, isYouTuBe)
@@ -261,7 +264,19 @@ fun MovieDetailRoute(
         onShare = {
             shareTMDBMedia(context, mediaId, mediaType)
         },
+        onPreviewImage = {
+            previewImageUrl = it
+        },
     )
+
+    if (previewImageUrl != null) {
+        FullScreenPhoto(
+            photoUrl = previewImageUrl!!,
+            onDismiss = {
+                previewImageUrl = null
+            },
+        )
+    }
 }
 
 @Composable
@@ -271,7 +286,8 @@ fun MovieDetailScreen(
     movieImages: ImagesData?,
     accountState: AccountState?,
     onBackClick: (Boolean) -> Unit,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
+    onPreviewImage: (String?) -> Unit,
     onVideoClick: (String?, Boolean) -> Unit = { _, _ -> },
     onRetry: () -> Unit = {},
     onMoreCasts: (List<Cast>) -> Unit,
@@ -324,6 +340,7 @@ fun MovieDetailScreen(
                         onMoreImages = onMoreImages,
                         onPeopleDetail = onPeopleDetail,
                         scrollState = scrollState,
+                        onPreviewImage = onPreviewImage,
                     )
                 }
 
@@ -428,7 +445,8 @@ fun MovieDetailComponent(
     movieImages: ImagesData? = null,
     movieDetails: MovieDetails? = null,
     scrollState: ScrollState,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onPreviewImage: (String?) -> Unit,
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
     onVideoClick: (String?, Boolean) -> Unit = { _, _ -> },
     onMoreCasts: (List<Cast>) -> Unit,
     onMoreVideos: (List<Video>) -> Unit,
@@ -443,7 +461,9 @@ fun MovieDetailComponent(
         MovieBackdropLayout(
             mediaType = mediaType,
             movieDetails = movieDetails,
-            onBuildImage = onBuildImage
+            onBuildImage = { url, type ->
+                onBuildImage(url, type, ImageSize.MEDIUM)
+            }
         )
         MovieMiddleLayout(
             modifier = Modifier.padding(bottom = 24.dp),
@@ -453,13 +473,17 @@ fun MovieDetailComponent(
         MovieOverviewLayout(
             modifier = Modifier.padding(bottom = 24.dp),
             movieDetails = movieDetails,
-            onBuildImage = onBuildImage
+            onBuildImage = { url, type ->
+                onBuildImage(url, type, ImageSize.MEDIUM)
+            }
         )
         if (movieDetails?.credits?.cast?.isNotEmpty() == true) {
             MovieCastLayout(
                 modifier = Modifier.padding(bottom = 24.dp),
                 castList = movieDetails.credits.cast,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 onMoreCasts = onMoreCasts,
                 onPeopleDetail = onPeopleDetail
             )
@@ -478,7 +502,8 @@ fun MovieDetailComponent(
                 imageList = movieImages.backdrops,
                 imageType = ImageType.BACKDROP,
                 onBuildImage = onBuildImage,
-                onMoreImages = onMoreImages
+                onMoreImages = onMoreImages,
+                onPreviewImage = onPreviewImage,
             )
         }
         if (movieImages?.posters?.isNotEmpty() == true) {
@@ -487,7 +512,8 @@ fun MovieDetailComponent(
                 imageList = movieImages.posters,
                 imageType = ImageType.POSTER,
                 onBuildImage = onBuildImage,
-                onMoreImages = onMoreImages
+                onMoreImages = onMoreImages,
+                onPreviewImage = onPreviewImage,
             )
         }
     }
@@ -543,7 +569,7 @@ fun MovieDetailScreenPreview() {
             movieDetailUiState = MovieDetailUiState.Success(movieDetails),
             movieImages = null,
             onBackClick = {},
-            onBuildImage = { url, _ -> url },
+            onBuildImage = { url, _, _ -> url },
             onVideoClick = { _, _ -> },
             onRetry = {},
             onMoreCasts = {},
@@ -555,6 +581,7 @@ fun MovieDetailScreenPreview() {
             onWatchlist = {},
             onAddList = {},
             onShare = {},
+            onPreviewImage = {},
         )
     }
 }

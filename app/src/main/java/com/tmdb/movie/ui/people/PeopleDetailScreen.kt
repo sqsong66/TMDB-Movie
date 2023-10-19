@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.R
 import com.tmdb.movie.component.ErrorPage
+import com.tmdb.movie.component.FullScreenPhoto
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
@@ -58,24 +59,33 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PeopleDetailRoute(
-    onBackClick: (Boolean) -> Unit,
-    detailType: Int, // 0-首页进入 1-详情进入； 首页进入需要隐藏BottomBar，关闭时显示BottomBar
-    toMovieDetail: (Int, @MediaType Int) -> Unit,
-    viewModel: PeopleDetailViewModel = hiltViewModel()
+    onBackClick: (Boolean) -> Unit, detailType: Int, // 0-首页进入 1-详情进入； 首页进入需要隐藏BottomBar，关闭时显示BottomBar
+    toMovieDetail: (Int, @MediaType Int) -> Unit, viewModel: PeopleDetailViewModel = hiltViewModel()
 ) {
 
     BackHandler { onBackClick(detailType == 0) }
+    var previewImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
     val config by viewModel.configStream.collectAsStateWithLifecycle()
     val peopleCredits by viewModel.peopleCredits.collectAsStateWithLifecycle()
     val peopleDetailUiState by viewModel.peopleDetailUiState.collectAsStateWithLifecycle()
 
-    PeopleDetailScreen(
-        peopleDetailUiState = peopleDetailUiState,
+    PeopleDetailScreen(peopleDetailUiState = peopleDetailUiState,
         peopleCredits = peopleCredits,
         onBackClick = { onBackClick(detailType == 0) },
         onBuildImage = { url, type, size -> config.buildImageUrl(type, url, size) },
-        toMovieDetail = toMovieDetail
-    )
+        toMovieDetail = toMovieDetail,
+        onPreviewImage = { url ->
+            previewImageUrl = url
+        })
+
+    if (previewImageUrl != null) {
+        FullScreenPhoto(
+            photoUrl = previewImageUrl!!,
+            onDismiss = {
+                previewImageUrl = null
+            },
+        )
+    }
 }
 
 @Composable
@@ -83,6 +93,7 @@ fun PeopleDetailScreen(
     peopleDetailUiState: PeopleDetailUiState,
     peopleCredits: SortedPeopleCredits? = null,
     onBackClick: (Boolean) -> Unit,
+    onPreviewImage: (String?) -> Unit,
     toMovieDetail: (Int, @MediaType Int) -> Unit,
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
 ) {
@@ -93,8 +104,7 @@ fun PeopleDetailScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         PeopleBgComponent(
-            imageUrl = imageUrl,
-            useBlur = true
+            imageUrl = imageUrl, useBlur = true
         )
         when (peopleDetailUiState) {
             is PeopleDetailUiState.Error -> ErrorPage()
@@ -107,20 +117,16 @@ fun PeopleDetailScreen(
                     scrollState = scrollState,
                     peopleDetails = peopleDetailUiState.data,
                     peopleCredits = peopleCredits,
-                    onBuildImage = { url, type ->
-                        onBuildImage(url, type, ImageSize.MEDIUM)
-                    },
-                    toMovieDetail = toMovieDetail
+                    onBuildImage = onBuildImage,
+                    toMovieDetail = toMovieDetail,
+                    onPreviewImage = onPreviewImage
                 )
             }
         }
         PeopleDetailTopBar(
             modifier = Modifier.onGloballyPositioned {
                 topBarHeight = it.size.height
-            },
-            scrollState = scrollState,
-            peopleName = peopleName,
-            onBackClick = onBackClick
+            }, scrollState = scrollState, peopleName = peopleName, onBackClick = onBackClick
         )
     }
 }
@@ -137,38 +143,31 @@ fun PeopleDetailTopBar(
     var topBarAlpha by rememberSaveable { mutableFloatStateOf(0f) }
 
     LaunchedEffect(scrollState) {
-        snapshotFlow { scrollState.value }
-            .collectLatest { scrollValue ->
-                val deltaY = scrollValue.toFloat().coerceAtMost(topBarHeight.toFloat())
-                topBarAlpha = if (topBarHeight == 0) 0f else deltaY / topBarHeight.toFloat()
-            }
+        snapshotFlow { scrollState.value }.collectLatest { scrollValue ->
+            val deltaY = scrollValue.toFloat().coerceAtMost(topBarHeight.toFloat())
+            topBarAlpha = if (topBarHeight == 0) 0f else deltaY / topBarHeight.toFloat()
+        }
     }
 
-    TopAppBar(
-        modifier = modifier.onGloballyPositioned {
-            topBarHeight = it.size.height
-        },
-        title = {
-            Text(
-                text = peopleName,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = topBarAlpha)
-                )
+    TopAppBar(modifier = modifier.onGloballyPositioned {
+        topBarHeight = it.size.height
+    }, title = {
+        Text(
+            text = peopleName, style = MaterialTheme.typography.titleMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = topBarAlpha)
             )
-        },
-        navigationIcon = {
-            IconButton(onClick = {
-                onBackClick(true)
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-                    contentDescription = ""
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
         )
+    }, navigationIcon = {
+        IconButton(onClick = {
+            onBackClick(true)
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription = ""
+            )
+        }
+    }, colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
+    )
     )
 }
 
@@ -178,24 +177,21 @@ fun PeopleDetailComponent(
     scrollState: ScrollState,
     peopleDetails: PeopleDetails,
     peopleCredits: SortedPeopleCredits?,
+    onPreviewImage: (String?) -> Unit = {},
     toMovieDetail: (Int, @MediaType Int) -> Unit,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
 ) {
 
     var showAllKnownForBottomSheet by remember { mutableStateOf(false) }
     val sortedCasts = peopleCredits?.sortedCasts
     if (showAllKnownForBottomSheet && sortedCasts != null) {
-        PeopleActingBottomSheet(
-            name = peopleDetails.name ?: "",
-            castLists = sortedCasts,
-            onBottomSheetDismiss = {
-                showAllKnownForBottomSheet = false
-            },
-            onBuildImage = onBuildImage,
-            toMovieDetail = { id, type ->
-                toMovieDetail(id, type)
-            }
-        )
+        PeopleActingBottomSheet(name = peopleDetails.name ?: "", castLists = sortedCasts, onBottomSheetDismiss = {
+            showAllKnownForBottomSheet = false
+        }, onBuildImage = { url, type ->
+            onBuildImage(url, type, ImageSize.MEDIUM)
+        }, toMovieDetail = { id, type ->
+            toMovieDetail(id, type)
+        })
     }
 
     Column(
@@ -207,27 +203,26 @@ fun PeopleDetailComponent(
         PeopleDetailTopComponent(
             modifier = Modifier.padding(top = 8.dp),
             peopleDetails = peopleDetails,
-            onBuildImage = onBuildImage
+            onBuildImage = onBuildImage,
+            onPreviewImage = onPreviewImage,
         )
         PeopleBiographyComponent(
-            modifier = Modifier.padding(top = 24.dp),
-            biography = peopleDetails.getPeopleBiography(LocalContext.current)
+            modifier = Modifier.padding(top = 24.dp), biography = peopleDetails.getPeopleBiography(LocalContext.current)
         )
         if (peopleCredits?.knownForCredits?.isNotEmpty() == true) {
-            PeopleKnownForComponent(
-                modifier = Modifier.padding(top = 24.dp),
+            PeopleKnownForComponent(modifier = Modifier.padding(top = 24.dp),
                 peopleCredits = peopleCredits.knownForCredits,
-                onBuildImage = onBuildImage,
+                onBuildImage = { url, type ->
+                    onBuildImage(url, type, ImageSize.MEDIUM)
+                },
                 toMovieDetail = toMovieDetail,
                 onViewAllKnownFor = {
                     showAllKnownForBottomSheet = true
-                }
-            )
+                })
         }
         if (peopleDetails.alsoKnownAs?.isNotEmpty() == true) {
             AlsoKnownForComponent(
-                modifier = Modifier.padding(top = 18.dp),
-                knownList = peopleDetails.alsoKnownAs
+                modifier = Modifier.padding(top = 18.dp), knownList = peopleDetails.alsoKnownAs
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
@@ -238,8 +233,7 @@ fun PeopleDetailComponent(
 @Composable
 fun PeopleDetailScreenPreview() {
     TMDBMovieTheme {
-        PeopleDetailScreen(
-            peopleDetailUiState = PeopleDetailUiState.Loading,
+        PeopleDetailScreen(peopleDetailUiState = PeopleDetailUiState.Loading,
 //            peopleDetailUiState = PeopleDetailUiState.Success(
 //                PeopleDetails(
 //                    name = "Julianne Moore",
@@ -290,10 +284,7 @@ fun PeopleDetailScreenPreview() {
                         mediaType = "movie",
                     ),
                 )
-            ),
-            onBackClick = {},
-            toMovieDetail = { _, _ -> }
-        )
+            ), onBackClick = {}, toMovieDetail = { _, _ -> }, onPreviewImage = {})
     }
 }
 

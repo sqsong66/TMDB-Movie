@@ -27,6 +27,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.tmdb.movie.R
 import com.tmdb.movie.component.ProfileTitleComponent
+import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MovieImage
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
@@ -36,8 +37,9 @@ fun MovieDetailImageComponent(
     modifier: Modifier = Modifier,
     @ImageType imageType: Int,
     imageList: List<MovieImage>,
+    onPreviewImage: (String?) -> Unit,
     onMoreImages: (@ImageType Int, List<MovieImage>) -> Unit = { _, _ -> },
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
 ) {
     val context = LocalContext.current
     val backdropSize = imageList.size.coerceAtMost(5)
@@ -69,11 +71,11 @@ fun MovieDetailImageComponent(
                             end = if (index == backdropSize - 1) 16.dp else 8.dp
                         )
                         .clip(MaterialTheme.shapes.medium)
-                        .clickable { },
+                        .clickable { onPreviewImage(onBuildImage(imageList[index].filePath, imageType, ImageSize.LARGE)) },
                     model = ImageRequest.Builder(LocalContext.current)
                         .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
                         .error(BitmapDrawable(context.resources, placeholderBitmap))
-                        .data(onBuildImage(imageList[index].filePath, imageType))
+                        .data(onBuildImage(imageList[index].filePath, imageType, ImageSize.MEDIUM))
                         .crossfade(true).listener(onError = { _, _ ->
                             isImageError = true
                         }).build(),
@@ -96,7 +98,8 @@ fun MovieBackdropComponentPreview() {
                 MovieImage(),
                 MovieImage(),
                 MovieImage(),
-            )
+            ),
+            onPreviewImage = {},
         )
     }
 }

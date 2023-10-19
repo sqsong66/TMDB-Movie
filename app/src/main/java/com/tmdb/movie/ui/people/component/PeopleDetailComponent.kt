@@ -58,6 +58,7 @@ import com.tmdb.movie.R
 import com.tmdb.movie.component.AutoResizeText
 import com.tmdb.movie.component.FontSizeRange
 import com.tmdb.movie.component.ProfileTitleComponent
+import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.PeopleCast
@@ -70,7 +71,8 @@ import com.webtoonscorp.android.readmore.material3.ReadMoreText
 fun PeopleDetailTopComponent(
     modifier: Modifier = Modifier,
     peopleDetails: PeopleDetails,
-    onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
+    onPreviewImage: (String?) -> Unit = {},
 ) {
     val context = LocalContext.current
     val placeholderBitmap = AppCompatResources.getDrawable(context, R.drawable.image_placeholder)?.toBitmap()?.apply {
@@ -85,10 +87,14 @@ fun PeopleDetailTopComponent(
             modifier = Modifier
                 .padding(start = 16.dp)
                 .width(120.dp)
-                .clip(MaterialTheme.shapes.small),
+                .clip(MaterialTheme.shapes.small)
+                .clickable {
+                    onPreviewImage(onBuildImage(peopleDetails.profilePath, ImageType.PROFILE, ImageSize.LARGE))
+                },
             model = ImageRequest.Builder(LocalContext.current)
                 .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
-                .error(BitmapDrawable(context.resources, placeholderBitmap)).data(onBuildImage(peopleDetails.profilePath, ImageType.PROFILE))
+                .error(BitmapDrawable(context.resources, placeholderBitmap))
+                .data(onBuildImage(peopleDetails.profilePath, ImageType.PROFILE, ImageSize.MEDIUM))
                 .crossfade(true).build(),
             contentDescription = "",
             contentScale = ContentScale.FillWidth
