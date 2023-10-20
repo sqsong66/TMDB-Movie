@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.tmdb.movie.R
+import com.tmdb.movie.component.BlurHeaderBgComponent
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
@@ -74,7 +75,6 @@ import com.tmdb.movie.data.SearchHistory
 import com.tmdb.movie.data.SearchItem
 import com.tmdb.movie.ext.pxToDp
 import com.tmdb.movie.ui.home.component.HistorySearchComponent
-import com.tmdb.movie.ui.home.component.HomeBgComponent
 import com.tmdb.movie.ui.home.component.HomeMoviePagerComponent
 import com.tmdb.movie.ui.home.component.PopularPeopleComponent
 import com.tmdb.movie.ui.home.component.SearchResultComponent
@@ -204,7 +204,7 @@ fun HomeScreen(
             .pullRefresh(state = refreshState)
             .nestedScroll(nestedScrollConnection),
     ) {
-        if (imageUrl.isNotEmpty()) HomeBgComponent(imageUrl = imageUrl, useBlur = true)
+        if (imageUrl.isNotEmpty()) BlurHeaderBgComponent(imageUrl = imageUrl, useBlur = true)
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.R
+import com.tmdb.movie.component.BlurHeaderBgComponent
 import com.tmdb.movie.component.ErrorPage
 import com.tmdb.movie.component.FullScreenPhoto
 import com.tmdb.movie.data.ImageSize
@@ -47,7 +48,6 @@ import com.tmdb.movie.data.SortedPeopleCredits
 import com.tmdb.movie.ext.pxToDp
 import com.tmdb.movie.ui.people.component.AlsoKnownForComponent
 import com.tmdb.movie.ui.people.component.PeopleActingBottomSheet
-import com.tmdb.movie.ui.people.component.PeopleBgComponent
 import com.tmdb.movie.ui.people.component.PeopleBiographyComponent
 import com.tmdb.movie.ui.people.component.PeopleDetailLoadingPager
 import com.tmdb.movie.ui.people.component.PeopleDetailTopComponent
@@ -103,8 +103,11 @@ fun PeopleDetailScreen(
     var topBarHeight by remember { mutableIntStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        PeopleBgComponent(
-            imageUrl = imageUrl, useBlur = true
+        BlurHeaderBgComponent(
+            imageUrl = imageUrl,
+            useBlur = true,
+            scaleFactor = 2,
+            blurRadius = 12
         )
         when (peopleDetailUiState) {
             is PeopleDetailUiState.Error -> ErrorPage()

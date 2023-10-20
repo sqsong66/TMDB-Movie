@@ -43,9 +43,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tmdb.movie.R
+import com.tmdb.movie.component.BlurHeaderBgComponent
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.UserData
-import com.tmdb.movie.ui.me.component.MeAvatarBgComponent
 import com.tmdb.movie.ui.me.dialog.SignOutConfirmDialog
 import com.tmdb.movie.ui.me.dialog.ThemeDialog
 import com.tmdb.movie.ui.me.vm.MeViewModel
@@ -129,7 +129,11 @@ fun MeScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (avatarUrl.isNotEmpty()) MeAvatarBgComponent(imageUrl = avatarUrl)
+        if (avatarUrl.isNotEmpty()) BlurHeaderBgComponent(
+            imageUrl = avatarUrl,
+            scaleFactor = 6,
+            blurRadius = 20
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()

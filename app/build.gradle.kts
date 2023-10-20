@@ -84,6 +84,8 @@ configurations.all {
 }
 
 dependencies {
+    implementation(project(":lib-renderscript"))
+
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
@@ -148,11 +150,14 @@ dependencies {
     // Landscapist Coil
     implementation(libs.landscapist.coil)
     // Landscapist Transformation
-    implementation(libs.landscapist.transformation)
+    // implementation(libs.landscapist.transformation)
     // Room Database
     implementation(libs.room)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+    // Glide
+    implementation(libs.glide)
+    ksp(libs.glide.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
