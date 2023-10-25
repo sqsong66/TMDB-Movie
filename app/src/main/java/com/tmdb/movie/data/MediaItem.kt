@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.tmdb.movie.R
+import com.tmdb.movie.utils.formatLongToString
 import com.tmdb.movie.utils.niceDate
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
@@ -73,5 +74,14 @@ data class MovieItem(
         } else {
             overview.trim()
         }
+    }
+
+    fun toHomePopularMovie(): HomePopularMovie {
+        return HomePopularMovie(
+            id = id,
+            title = title,
+            backdropPath = backdropPath,
+            updatedAt = formatLongToString(System.currentTimeMillis())
+        )
     }
 }
