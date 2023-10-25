@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import com.tmdb.movie.R
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.ext.pxToDp
 import com.tmdb.movie.ui.discovery.component.DiscoveryTabRow
@@ -33,13 +33,13 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
-fun DiscoveryRoute(navigateToDetail: (MovieItem?, @MediaType Int) -> Unit) {
+fun DiscoveryRoute(navigateToDetail: (MediaItem?, @MediaType Int) -> Unit) {
     DiscoveryScreen(toDetail = navigateToDetail)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DiscoveryScreen(toDetail: (MovieItem?, @MediaType Int) -> Unit = { _, _ -> }) {
+fun DiscoveryScreen(toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> }) {
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()

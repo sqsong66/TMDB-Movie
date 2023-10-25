@@ -44,7 +44,7 @@ import com.tmdb.movie.R
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.ui.home.vm.MovieLoadState
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +56,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun HomeMoviePagerComponent(
     modifier: Modifier,
-    moviePopularState: MovieLoadState<MovieItem>,
+    moviePopularState: MovieLoadState<MediaItem>,
     onPageChanged: (String) -> Unit,
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
     navigateToMovieDetail: (Int, @MediaType Int) -> Unit = { _, _ -> },
@@ -80,7 +80,7 @@ fun HomeMoviePagerComponent(
 @ExperimentalFoundationApi
 fun HomePagerComponent(
     modifier: Modifier,
-    movieList: List<MovieItem>,
+    movieList: List<MediaItem>,
     onPageChanged: (String) -> Unit,
     navigateToMovieDetail: (Int, @MediaType Int) -> Unit = { _, _ -> },
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
@@ -286,7 +286,7 @@ fun HomePagerComponentPreview() {
             modifier = Modifier,
             onPageChanged = {},
             movieList = listOf(
-                MovieItem(
+                MediaItem(
                     title = "Movie 1",
                     posterPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
                     backdropPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
@@ -294,7 +294,7 @@ fun HomePagerComponentPreview() {
                     releaseDate = "2021-09-01",
                     voteAverage = 8.0f,
                 ),
-                MovieItem(
+                MediaItem(
                     title = "Movie 2",
                     posterPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
                     backdropPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
@@ -302,7 +302,7 @@ fun HomePagerComponentPreview() {
                     releaseDate = "2021-09-01",
                     voteAverage = 8.0f,
                 ),
-                MovieItem(
+                MediaItem(
                     title = "Movie 3",
                     posterPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
                     backdropPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
@@ -310,7 +310,7 @@ fun HomePagerComponentPreview() {
                     releaseDate = "2021-09-01",
                     voteAverage = 8.0f,
                 ),
-                MovieItem(
+                MediaItem(
                     title = "Movie 4",
                     posterPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",
                     backdropPath = "https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg",

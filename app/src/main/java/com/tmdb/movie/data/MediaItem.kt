@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
 
 @Parcelize
-data class MovieItem(
+data class MediaItem(
     @SerializedName("adult")
     val adult: Boolean = false,
     @SerializedName("backdrop_path")
@@ -61,6 +61,14 @@ data class MovieItem(
         }
     }
 
+    fun getMovieName(): String {
+        return if (getMediaType() == MediaType.MOVIE) {
+            title ?: originalTitle ?: ""
+        } else {
+            name ?: originalName ?: ""
+        }
+    }
+
     fun getNiceDate(@MediaType mediaType: Int, isFormatShort: Boolean): String? {
         return niceDate(
             if (mediaType == MediaType.MOVIE) releaseDate else firstAirDate,
@@ -83,5 +91,13 @@ data class MovieItem(
             backdropPath = backdropPath,
             updatedAt = formatLongToString(System.currentTimeMillis())
         )
+    }
+
+    fun getMediaType(): @MediaType Int {
+        return when (mediaType) {
+            "movie" -> MediaType.MOVIE
+            "tv" -> MediaType.TV
+            else -> MediaType.PERSON
+        }
     }
 }

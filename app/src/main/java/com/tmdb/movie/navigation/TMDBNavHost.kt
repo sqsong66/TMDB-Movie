@@ -19,6 +19,10 @@ import com.tmdb.movie.ui.detail.navigateToMovieDetail
 import com.tmdb.movie.ui.discovery.discoveryScreen
 import com.tmdb.movie.ui.home.homeNavigationRoute
 import com.tmdb.movie.ui.home.homeScreen
+import com.tmdb.movie.ui.lists.accountListsScreen
+import com.tmdb.movie.ui.lists.listsDetailScreen
+import com.tmdb.movie.ui.lists.navigateToAccountLists
+import com.tmdb.movie.ui.lists.navigateToListsDetail
 import com.tmdb.movie.ui.main.component.LoginTipsDialog
 import com.tmdb.movie.ui.main.vm.MainViewModel
 import com.tmdb.movie.ui.me.dialog.AuthenticationDialog
@@ -27,8 +31,6 @@ import com.tmdb.movie.ui.media.createListScreen
 import com.tmdb.movie.ui.media.navigateToCreateList
 import com.tmdb.movie.ui.people.navigateToPeopleDetail
 import com.tmdb.movie.ui.people.peopleDetailScreen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun TMDBNavHost(
@@ -114,11 +116,27 @@ fun TMDBNavHost(
         meScreen(
             toAuthorize = {
                 isShowAuthenticationDialog = true
-            }
+            },
+            toMyLists = {
+                onShowBottomBar(false)
+                navController.navigateToAccountLists(it)
+            },
         )
         peopleDetailScreen(onBackClick = onBackClick, toMovieDetail = { movieId, type ->
             navController.navigateToMovieDetail(movieId, type, from = 1)
         })
         createListScreen(onBackClick = onBackClick)
+        accountListsScreen(
+            toListsDetail = {
+                navController.navigateToListsDetail(it)
+            },
+            onBackClick = onBackClick
+        )
+        listsDetailScreen(
+            toMediaDetail = { id, type ->
+                navController.navigateToMovieDetail(id, type, from = 1)
+            },
+            onBackClick = onBackClick
+        )
     }
 }

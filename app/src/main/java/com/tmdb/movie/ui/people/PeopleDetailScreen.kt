@@ -152,25 +152,29 @@ fun PeopleDetailTopBar(
         }
     }
 
-    TopAppBar(modifier = modifier.onGloballyPositioned {
-        topBarHeight = it.size.height
-    }, title = {
-        Text(
-            text = peopleName, style = MaterialTheme.typography.titleMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = topBarAlpha)
+    TopAppBar(
+        modifier = modifier.onGloballyPositioned {
+            topBarHeight = it.size.height
+        },
+        title = {
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = peopleName, style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = topBarAlpha)
+                )
             )
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                onBackClick(true)
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription = ""
+                )
+            }
+        }, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
         )
-    }, navigationIcon = {
-        IconButton(onClick = {
-            onBackClick(true)
-        }) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription = ""
-            )
-        }
-    }, colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = topBarAlpha),
-    )
     )
 }
 

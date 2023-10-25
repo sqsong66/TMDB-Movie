@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,6 +55,7 @@ import com.tmdb.movie.ui.theme.TMDBMovieTheme
 @Composable
 fun MeRoute(
     toAuthorize: () -> Unit,
+    toMyLists: (Int) -> Unit,
     viewModel: MeViewModel = hiltViewModel()
 ) {
 
@@ -95,15 +97,25 @@ fun MeRoute(
         onAvatarClick = {
             if (configStream.isLogin()) return@MeScreen
             toAuthorize()
-        }, onChangeTheme = {
+        },
+        onChangeTheme = {
             isShowThemeDialog = true
-        }, onSignOut = {
+        },
+        onSignOut = {
             isShowSignOutDialog = true
-        }, onBuildAvatar = {
+        },
+        onBuildAvatar = {
             avatarUrl = configStream.buildAvatarUrl(context, true)
             configStream.buildAvatarUrl(context)
         },
-        avatarUrl = avatarUrl
+        avatarUrl = avatarUrl,
+        onClickLists = {
+            if (configStream.isLogin()) {
+                toMyLists(configStream.userData?.id ?: 0)
+            } else {
+                toAuthorize()
+            }
+        }
     )
 }
 
@@ -113,6 +125,7 @@ fun MeScreen(
     onAvatarClick: () -> Unit,
     onChangeTheme: () -> Unit,
     onSignOut: () -> Unit,
+    onClickLists: () -> Unit,
     avatarUrl: String = "",
     onBuildAvatar: () -> String = { "" },
 ) {
@@ -132,7 +145,7 @@ fun MeScreen(
         if (avatarUrl.isNotEmpty()) BlurHeaderBgComponent(
             imageUrl = avatarUrl,
             scaleFactor = 6,
-            blurRadius = 20
+            blurRadius = 20,
         )
         Column(
             modifier = Modifier
@@ -170,9 +183,16 @@ fun MeScreen(
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp)
                     .background(
-                        MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp)
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(
+                            topStart = 8.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp
+                        )
                     )
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(
+                        shape = RoundedCornerShape(
+                            topStart = 8.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp
+                        )
+                    )
                     .clickable { onChangeTheme() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -192,11 +212,122 @@ fun MeScreen(
                 Spacer(modifier = Modifier.weight(1f))
             }
 
+            /*Divider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+            )*/
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(
+                            topStart = 8.dp, topEnd = 8.dp
+                        )
+                    )
+                    .clip(
+                        shape = RoundedCornerShape(
+                            topStart = 8.dp, topEnd = 8.dp
+                        )
+                    )
+                    .clickable { onClickLists() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+                    painter = painterResource(id = R.drawable.baseline_lists_24),
+                    contentDescription = "List",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = stringResource(id = R.string.key_lists),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Divider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+
+                        )
+
+                    .clickable { onClickLists() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+                    painter = painterResource(id = R.drawable.baseline_star_24),
+                    contentDescription = "List",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = stringResource(id = R.string.key_ratings),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Divider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(
+                            bottomStart = 8.dp, bottomEnd = 8.dp
+                        )
+                    )
+                    .clip(
+                        shape = RoundedCornerShape(
+                            bottomStart = 8.dp, bottomEnd = 8.dp
+                        )
+                    )
+                    .clickable { onClickLists() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+                    painter = painterResource(id = R.drawable.baseline_playlist_24),
+                    contentDescription = "List",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = stringResource(id = R.string.key_watchlist),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
             AnimatedVisibility(visible = config.userData != null) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
                         .background(
                             MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp)
                         )
@@ -236,6 +367,7 @@ fun MeScreenPreview() {
             onAvatarClick = {},
             onChangeTheme = {},
             onSignOut = {},
+            onClickLists = {}
         )
     }
 }

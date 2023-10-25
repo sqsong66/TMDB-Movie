@@ -2,11 +2,13 @@ package com.tmdb.movie.repository
 
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.CreateListParam
+import com.tmdb.movie.data.HomePopularMovie
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.ListsDetail
 import com.tmdb.movie.data.MediaList
-import com.tmdb.movie.data.MovieDetails
-import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.MediaType
+import com.tmdb.movie.data.MovieDetails
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.PeopleCredits
 import com.tmdb.movie.data.PeopleDetails
@@ -15,7 +17,9 @@ import com.tmdb.movie.data.ResponseResult
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.TMDBConfiguration
+import com.tmdb.movie.data.UserData
 import com.tmdb.movie.paging.DiscoveryMoviePagingSource
+import com.tmdb.movie.paging.MyMediaListPagingSource
 import com.tmdb.movie.paging.SearchMoviePagingSource
 import kotlinx.coroutines.flow.Flow
 
@@ -29,21 +33,21 @@ interface IMovieRepository {
 
     suspend fun getTMDBConfiguration(): TMDBConfiguration
 
-    fun getMoviesTrending(): Flow<Result<List<MovieItem>>>
+    fun getMoviesTrending(): Flow<Result<List<MediaItem>>>
 
-    fun getTVTrending(): Flow<Result<List<MovieItem>>>
+    fun getTVTrending(): Flow<Result<List<MediaItem>>>
 
     fun getPeopleTrending(): Flow<Result<List<People>>>
 
     fun getPopularPeople(): Flow<Result<List<People>>>
 
-    fun getMovieNowPlaying(page: Int = 1): Flow<Result<List<MovieItem>>>
+    fun getMovieNowPlaying(page: Int = 1): Flow<Result<List<MediaItem>>>
 
-    fun getTVAiringToday(page: Int = 1): Flow<Result<List<MovieItem>>>
+    fun getTVAiringToday(page: Int = 1): Flow<Result<List<MediaItem>>>
 
-    fun getMoviePopular(page: Int = 1): Flow<Result<List<MovieItem>>>
+    fun getMoviePopular(page: Int = 1): Flow<Result<List<MediaItem>>>
 
-    fun getTVPopular(page: Int = 1): Flow<Result<List<MovieItem>>>
+    fun getTVPopular(page: Int = 1): Flow<Result<List<MediaItem>>>
 
     fun getDiscoveryMoviePagingSource(discoveryType: Int): DiscoveryMoviePagingSource
 
@@ -78,4 +82,12 @@ interface IMovieRepository {
     fun addMediaToList(sessionId: String, mediaId: Int, listId: Int): Flow<Result<ResponseResult>>
 
     fun createList(sessionId: String, param: CreateListParam): Flow<Result<Boolean>>
+
+    fun getHomePopularMovie(): Flow<Result<List<HomePopularMovie>>>
+
+    fun getAccountListsPagingSource(accountId: Int): MyMediaListPagingSource
+
+    fun getListsDetail(listId: Int): Flow<Result<ListsDetail>>
+
+    suspend fun updateUserData(sessionId: String): UserData
 }

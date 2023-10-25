@@ -34,6 +34,15 @@ class MainViewModel @Inject constructor(
             Log.w("sqsong", "TMDBConfig: $it")
             Success(it)
         }
+        .map {
+            val config = it.config
+            if (config.isLogin()) {
+                config.userData?.sessionId?.let { id ->
+                    movieRepository.updateUserData(id)
+                }
+            }
+            it
+        }
         .stateIn(
             scope = viewModelScope,
             initialValue = Loading,

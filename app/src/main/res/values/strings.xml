@@ -109,4 +109,8 @@
     <string name="key_create_list_failed">Create list failed</string>
     <string name="key_no_videos">No Videos</string>
     <string name="key_casts">Casts</string>
+    <string name="key_lists">Lists</string>
+    <string name="key_ratings">Ratings</string>
+    <string name="key_watchlist">Watchlist</string>
+    <string name="key_list_items">%d items</string>
 </resources>

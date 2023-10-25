@@ -27,7 +27,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.ui.discovery.component.DiscoveryMovieListComponent
@@ -41,7 +41,7 @@ fun DiscoveryMovieRoute(
     topHeight: Dp = 0.dp,
     @MediaType mediaType: Int = MediaType.MOVIE, // 0-Movie 1-TV
     onPullRefreshProgress: (Float) -> Unit = {},
-    toDetail: (MovieItem?, Int) -> Unit = { _, _ -> },
+    toDetail: (MediaItem?, Int) -> Unit = { _, _ -> },
     viewModel: DiscoveryMovieViewModel = hiltViewModel(),
 ) {
 
@@ -72,9 +72,9 @@ fun DiscoveryMoviePage(
     topHeight: Dp = 0.dp,
     @MediaType mediaType: Int = MediaType.MOVIE, // 0-Movie 1-TV
     onPullRefreshProgress: (Float) -> Unit = {},
-    movieList: LazyPagingItems<MovieItem>? = null,
+    movieList: LazyPagingItems<MediaItem>? = null,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    toDetail: (MovieItem?, Int) -> Unit = { _, _ -> },
+    toDetail: (MediaItem?, Int) -> Unit = { _, _ -> },
 ) {
 
     // 是否是刷新状态

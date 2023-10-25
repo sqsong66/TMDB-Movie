@@ -5,12 +5,14 @@ import androidx.datastore.core.DataStore
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.CreateListParam
 import com.tmdb.movie.data.FavoriteRequest
+import com.tmdb.movie.data.HomePopularMovie
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.ListsDetail
 import com.tmdb.movie.data.MediaIdRequest
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
-import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.PeopleCredits
 import com.tmdb.movie.data.PeopleDetails
@@ -21,10 +23,13 @@ import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.Session
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.TMDBConfiguration
+import com.tmdb.movie.data.UserData
 import com.tmdb.movie.data.WatchlistRequest
 import com.tmdb.movie.data.asResult
+import com.tmdb.movie.db.PopularMovieDao
 import com.tmdb.movie.network.ApiService
 import com.tmdb.movie.paging.DiscoveryMoviePagingSource
+import com.tmdb.movie.paging.MyMediaListPagingSource
 import com.tmdb.movie.paging.SearchMoviePagingSource
 import com.tmdb.movie.utils.BASE_TMDB_IMAGE_URL
 import com.tmdb.movie.utils.DEFAULT_IMAGE_SIZE
@@ -39,6 +44,7 @@ import javax.inject.Inject
 
 class TMDBMovieRepository @Inject constructor(
     private val apiService: ApiService,
+    private val movieDao: PopularMovieDao,
     private val dataStore: DataStore<TMDBConfig>,
 ) : IMovieRepository {
 
@@ -61,22 +67,22 @@ class TMDBMovieRepository @Inject constructor(
                         )
                     }
                 }
-            } else {
-                config
             }
-        }.catch {
-            emit(
-                TMDBConfig(
-                    baseImageUrl = BASE_TMDB_IMAGE_URL,
-                    backdropSizeList = listOf(DEFAULT_IMAGE_SIZE),
-                    logoSizeList = listOf(DEFAULT_IMAGE_SIZE),
-                    posterSizeList = listOf(DEFAULT_IMAGE_SIZE),
-                    profileSizeList = listOf(DEFAULT_IMAGE_SIZE),
-                    stillSizeList = listOf(DEFAULT_IMAGE_SIZE),
-                    updateTime = null
-                )
-            )
+            config
         }
+            .catch {
+                emit(
+                    TMDBConfig(
+                        baseImageUrl = BASE_TMDB_IMAGE_URL,
+                        backdropSizeList = listOf(DEFAULT_IMAGE_SIZE),
+                        logoSizeList = listOf(DEFAULT_IMAGE_SIZE),
+                        posterSizeList = listOf(DEFAULT_IMAGE_SIZE),
+                        profileSizeList = listOf(DEFAULT_IMAGE_SIZE),
+                        stillSizeList = listOf(DEFAULT_IMAGE_SIZE),
+                        updateTime = null
+                    )
+                )
+            }
 
     override suspend fun updateDarkThemeType(themeType: Int) {
         dataStore.updateData { currentThemeConfig ->
@@ -94,13 +100,13 @@ class TMDBMovieRepository @Inject constructor(
         return apiService.getConfiguration()
     }
 
-    override fun getMoviesTrending(): Flow<Result<List<MovieItem>>> = flow {
+    override fun getMoviesTrending(): Flow<Result<List<MediaItem>>> = flow {
         Log.w("sqsong", "Get Trending movies.")
         emit(apiService.getMoviesTrending())
     }.map { it.results ?: emptyList() }
         .asResult()
 
-    override fun getTVTrending(): Flow<Result<List<MovieItem>>> = flow {
+    override fun getTVTrending(): Flow<Result<List<MediaItem>>> = flow {
         Log.w("sqsong", "Get Trending TV.")
         emit(apiService.getTVTrending())
     }.map { it.results ?: emptyList() }
@@ -118,25 +124,34 @@ class TMDBMovieRepository @Inject constructor(
     }.map { it.results ?: emptyList() }
         .asResult()
 
-    override fun getMovieNowPlaying(page: Int): Flow<Result<List<MovieItem>>> = flow {
+    override fun getMovieNowPlaying(page: Int): Flow<Result<List<MediaItem>>> = flow {
         Log.w("sqsong", "Get now playing movies.")
         emit(apiService.getMoviesNowPlaying())
     }.map { it.results ?: emptyList() }
         .asResult()
 
-    override fun getTVAiringToday(page: Int): Flow<Result<List<MovieItem>>> = flow {
+    override fun getTVAiringToday(page: Int): Flow<Result<List<MediaItem>>> = flow {
         Log.w("sqsong", "Get airing day TV.")
         emit(apiService.getTVAiringToday())
     }.map { it.results ?: emptyList() }
         .asResult()
 
-    override fun getMoviePopular(page: Int): Flow<Result<List<MovieItem>>> = flow {
+    override fun getMoviePopular(page: Int): Flow<Result<List<MediaItem>>> = flow {
         Log.w("sqsong", "Get popular movies.")
-        emit(apiService.getMoviesPopular())
-    }.map { it.results ?: emptyList() }
-        .asResult()
+        val movieList = apiService.getMoviesPopular().results
+        movieList?.let {
+            val firstMovie = movieDao.getFirstPopularMovie()
+            val currentDate = formatLongToString(System.currentTimeMillis())
+            if (firstMovie == null || firstMovie.updatedAt != currentDate) {
+                movieDao.deleteAllPopularMovies()
+                movieDao.insertPopularMovies(movieList.map { it.toHomePopularMovie() })
+            }
+            Log.e("sqsong", "firstMovie: $firstMovie")
+        }
+        emit(movieList ?: emptyList())
+    }.asResult()
 
-    override fun getTVPopular(page: Int): Flow<Result<List<MovieItem>>> = flow {
+    override fun getTVPopular(page: Int): Flow<Result<List<MediaItem>>> = flow {
         Log.w("sqsong", "Get popular TV.")
         emit(apiService.getTVPopular())
     }.map { it.results ?: emptyList() }
@@ -168,15 +183,6 @@ class TMDBMovieRepository @Inject constructor(
         delay(1000)
         emit(apiService.getPeopleDetails(id))
     }.asResult()
-
-//    override fun getPeopleCredits(id: Int, @MediaType mediaType: Int): Flow<Result<PeopleCredits>> = flow {
-//        val credits = if (mediaType == MediaType.MOVIE) {
-//            apiService.getPeopleMovieCredits(id)
-//        } else {
-//            apiService.getPeopleTvCredits(id)
-//        }
-//        emit(credits)
-//    }.asResult()
 
     override fun getPeopleCredits(id: Int): Flow<Result<PeopleCredits>> = flow {
         emit(apiService.getPeopleMovieCredits(id))
@@ -237,8 +243,8 @@ class TMDBMovieRepository @Inject constructor(
 
     override fun markAsFavorite(accountId: Int, sessionId: String, movieType: Int, mediaId: Int, favorite: Boolean): Flow<Result<Boolean>> =
         flow {
-            val mediaType = if (movieType == MediaType.MOVIE) "movie" else "tv"
-            val request = FavoriteRequest(mediaType = mediaType, mediaId = mediaId, favorite = favorite)
+            val newMediaType = if (movieType == MediaType.MOVIE) "movie" else "tv"
+            val request = FavoriteRequest(mediaType = newMediaType, mediaId = mediaId, favorite = favorite)
             val result = apiService.addToFavorite(accountId, request)
             if (!result.success) throw Exception("Change favorite state error: ${result.statusMessage}.")
             emit(favorite)
@@ -246,8 +252,8 @@ class TMDBMovieRepository @Inject constructor(
 
     override fun addToWatchlist(accountId: Int, sessionId: String, movieType: Int, mediaId: Int, watchlist: Boolean): Flow<Result<Boolean>> =
         flow {
-            val mediaType = if (movieType == MediaType.MOVIE) "movie" else "tv"
-            val request = WatchlistRequest(mediaType = mediaType, mediaId = mediaId, watchlist = watchlist)
+            val newMediaType = if (movieType == MediaType.MOVIE) "movie" else "tv"
+            val request = WatchlistRequest(mediaType = newMediaType, mediaId = mediaId, watchlist = watchlist)
             val result = apiService.addToWatchlist(accountId, request)
             if (!result.success) throw Exception("Change watchlist state error: ${result.statusMessage}.")
             emit(watchlist)
@@ -271,4 +277,19 @@ class TMDBMovieRepository @Inject constructor(
         }.asResult()
     }
 
+    override fun getHomePopularMovie(): Flow<Result<List<HomePopularMovie>>> = movieDao.getPopularMovies().asResult()
+
+    override fun getAccountListsPagingSource(accountId: Int): MyMediaListPagingSource = MyMediaListPagingSource(accountId, apiService)
+
+    override fun getListsDetail(listId: Int): Flow<Result<ListsDetail>> = flow {
+        emit(apiService.getListsDetail(listId))
+    }.asResult()
+
+    override suspend fun updateUserData(sessionId: String): UserData {
+        val userData = apiService.getUserData(sessionId)
+        dataStore.updateData {
+            it.copy(userData = userData.copy(sessionId = sessionId))
+        }
+        return userData
+    }
 }

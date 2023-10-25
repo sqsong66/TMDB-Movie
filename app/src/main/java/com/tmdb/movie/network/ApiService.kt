@@ -5,10 +5,11 @@ import com.tmdb.movie.data.BaseListData
 import com.tmdb.movie.data.CreateListParam
 import com.tmdb.movie.data.FavoriteRequest
 import com.tmdb.movie.data.ImagesData
+import com.tmdb.movie.data.ListsDetail
 import com.tmdb.movie.data.MediaIdRequest
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.data.MovieDetails
-import com.tmdb.movie.data.MovieItem
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.PeopleCredits
 import com.tmdb.movie.data.PeopleDetails
@@ -35,10 +36,10 @@ interface ApiService {
     suspend fun getConfiguration(): TMDBConfiguration
 
     @GET("trending/movie/day")
-    suspend fun getMoviesTrending(@Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getMoviesTrending(@Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("trending/tv/day")
-    suspend fun getTVTrending(@Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getTVTrending(@Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("trending/person/day")
     suspend fun getPeopleTrending(@Query("language") language: String = getLanguage()): BaseListData<People>
@@ -47,22 +48,22 @@ interface ApiService {
     suspend fun getPopularPeople(@Query("language") language: String = getLanguage()): BaseListData<People>
 
     @GET("movie/now_playing")
-    suspend fun getMoviesNowPlaying(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getMoviesNowPlaying(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("tv/airing_today")
-    suspend fun getTVAiringToday(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getTVAiringToday(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("movie/popular")
-    suspend fun getMoviesPopular(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getMoviesPopular(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("tv/popular")
-    suspend fun getTVPopular(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getTVPopular(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("discover/movie")
-    suspend fun getDiscoveryMovies(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getDiscoveryMovies(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("discover/tv")
-    suspend fun getDiscoveryTV(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MovieItem>
+    suspend fun getDiscoveryTV(@Query("page") page: Int = 1, @Query("language") language: String = getLanguage()): BaseListData<MediaItem>
 
     @GET("movie/{id}")
     suspend fun getMovieDetails(
@@ -154,4 +155,7 @@ interface ApiService {
 
     @POST("list")
     suspend fun createList(@Query("session_id") sessionId: String, @Body body: CreateListParam): ResponseResult
+
+    @GET("list/{list_id}")
+    suspend fun getListsDetail(@Path("list_id") listId: Int, @Query("language") language: String = getLanguage()): ListsDetail
 }

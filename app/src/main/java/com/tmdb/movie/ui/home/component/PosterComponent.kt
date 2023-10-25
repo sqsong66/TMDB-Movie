@@ -39,7 +39,7 @@ import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
 import com.tmdb.movie.R
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.ui.home.vm.MovieLoadState
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
@@ -49,7 +49,7 @@ fun TrendingComponent(
     modifier: Modifier = Modifier,
     @MediaType mediaType: Int = MediaType.MOVIE,
     title: String,
-    trendingState: MovieLoadState<MovieItem>,
+    trendingState: MovieLoadState<MediaItem>,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
     navigateToMovieDetail: (Int, @MediaType Int) -> Unit = { _, _ -> },
 ) {
@@ -100,7 +100,7 @@ fun TrendingComponent(
 
 @Composable
 fun PosterComponent(
-    movieItem: MovieItem?,
+    movieItem: MediaItem?,
     modifier: Modifier = Modifier,
     @MediaType mediaType: Int = MediaType.MOVIE,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },

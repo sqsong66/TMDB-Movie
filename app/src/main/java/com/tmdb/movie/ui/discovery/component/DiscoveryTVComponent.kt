@@ -49,16 +49,16 @@ import com.tmdb.movie.component.LoadingError
 import com.tmdb.movie.component.LoadingFooter
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 
 @Composable
 fun DiscoveryTVListComponent(
     modifier: Modifier = Modifier,
     topHeight: Dp,
-    movieList: LazyPagingItems<MovieItem>? = null,
+    movieList: LazyPagingItems<MediaItem>? = null,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    toDetail: (MovieItem?, Int) -> Unit = { _, _ -> },
+    toDetail: (MediaItem?, Int) -> Unit = { _, _ -> },
 ) {
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
@@ -125,9 +125,9 @@ fun DiscoveryTVListComponent(
 @Composable
 fun DiscoveryTVComponent(
     modifier: Modifier = Modifier,
-    movieItem: MovieItem,
+    movieItem: MediaItem,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    toDetail: (MovieItem?, @MediaType Int) -> Unit = { _, _ -> }
+    toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
     val placeholderBitmap =
@@ -314,7 +314,7 @@ fun DiscoveryTVComponentPlaceholder(modifier: Modifier = Modifier) {
 fun DiscoveryTVComponentPreview() {
     TMDBMovieTheme {
         DiscoveryTVComponent(
-            movieItem = MovieItem(
+            movieItem = MediaItem(
                 name = "The Continental: From the World of John Wick",
                 voteAverage = 7.708f,
                 posterPath = "/v1YEOdGptCyNxnc4mJSYNd4cE8E.jpg",

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.TMDBConfig
@@ -67,17 +67,17 @@ class HomeViewModel @Inject constructor(
 
     val popularPeopleState: StateFlow<MovieLoadState<People>> = buildNetworkStateFlow(triggerChannel2) { movieRepository.getPopularPeople() }
 
-    val movieTrendingState: StateFlow<MovieLoadState<MovieItem>> = buildNetworkStateFlow(triggerChannel) { movieRepository.getMoviesTrending() }
+    val movieTrendingState: StateFlow<MovieLoadState<MediaItem>> = buildNetworkStateFlow(triggerChannel) { movieRepository.getMoviesTrending() }
 
-    val tvTrendingState: StateFlow<MovieLoadState<MovieItem>> = buildNetworkStateFlow(triggerChannel1) { movieRepository.getTVTrending() }
+    val tvTrendingState: StateFlow<MovieLoadState<MediaItem>> = buildNetworkStateFlow(triggerChannel1) { movieRepository.getTVTrending() }
 
-    val movieNowPlayingState: StateFlow<MovieLoadState<MovieItem>> = buildNetworkStateFlow(triggerChannel3) { movieRepository.getMovieNowPlaying() }
+    val movieNowPlayingState: StateFlow<MovieLoadState<MediaItem>> = buildNetworkStateFlow(triggerChannel3) { movieRepository.getMovieNowPlaying() }
 
-    val tvAirTodayState: StateFlow<MovieLoadState<MovieItem>> = buildNetworkStateFlow(triggerChannel4) { movieRepository.getTVAiringToday() }
+    val tvAirTodayState: StateFlow<MovieLoadState<MediaItem>> = buildNetworkStateFlow(triggerChannel4) { movieRepository.getTVAiringToday() }
 
-    val moviePopularState: StateFlow<MovieLoadState<MovieItem>> = buildNetworkStateFlow(triggerChannel5) { movieRepository.getMoviePopular() }
+    val moviePopularState: StateFlow<MovieLoadState<MediaItem>> = buildNetworkStateFlow(triggerChannel5) { movieRepository.getMoviePopular() }
 
-    val tvPopularState: StateFlow<MovieLoadState<MovieItem>> = buildNetworkStateFlow(triggerChannel6) { movieRepository.getTVPopular() }
+    val tvPopularState: StateFlow<MovieLoadState<MediaItem>> = buildNetworkStateFlow(triggerChannel6) { movieRepository.getTVPopular() }
 
     val recentSearchList = searchRepository.getRecentSearchQueries()
         .stateIn(

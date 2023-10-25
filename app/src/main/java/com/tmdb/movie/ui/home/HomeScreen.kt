@@ -69,7 +69,7 @@ import com.tmdb.movie.component.BlurHeaderBgComponent
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaType
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.People
 import com.tmdb.movie.data.SearchHistory
 import com.tmdb.movie.data.SearchItem
@@ -146,13 +146,13 @@ fun HomeRoute(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
-    moviesTrendingState: MovieLoadState<MovieItem> = MovieLoadState.Loading(),
-    tvTrendingState: MovieLoadState<MovieItem> = MovieLoadState.Loading(),
+    moviesTrendingState: MovieLoadState<MediaItem> = MovieLoadState.Loading(),
+    tvTrendingState: MovieLoadState<MediaItem> = MovieLoadState.Loading(),
     popularPeopleState: MovieLoadState<People> = MovieLoadState.Loading(),
-    movieNowPlayingState: MovieLoadState<MovieItem> = MovieLoadState.Loading(),
-    tvAirTodayState: MovieLoadState<MovieItem> = MovieLoadState.Loading(),
-    moviePopularState: MovieLoadState<MovieItem> = MovieLoadState.Loading(),
-    tvPopularState: MovieLoadState<MovieItem> = MovieLoadState.Loading(),
+    movieNowPlayingState: MovieLoadState<MediaItem> = MovieLoadState.Loading(),
+    tvAirTodayState: MovieLoadState<MediaItem> = MovieLoadState.Loading(),
+    moviePopularState: MovieLoadState<MediaItem> = MovieLoadState.Loading(),
+    tvPopularState: MovieLoadState<MediaItem> = MovieLoadState.Loading(),
     onSearchQueryChanged: (String) -> Unit = {},
     onSearchTriggered: (String) -> Unit = {},
     onActiveStateChanged: (Boolean) -> Unit = {},

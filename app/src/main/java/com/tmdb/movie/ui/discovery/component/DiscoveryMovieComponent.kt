@@ -48,7 +48,7 @@ import com.tmdb.movie.component.ErrorPage
 import com.tmdb.movie.component.LoadingError
 import com.tmdb.movie.component.LoadingFooter
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MovieItem
+import com.tmdb.movie.data.MediaItem
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 
@@ -56,9 +56,9 @@ import com.tmdb.movie.ui.theme.TMDBMovieTheme
 fun DiscoveryMovieListComponent(
     modifier: Modifier = Modifier,
     topHeight: Dp,
-    movieList: LazyPagingItems<MovieItem>? = null,
+    movieList: LazyPagingItems<MediaItem>? = null,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    toDetail: (MovieItem?, Int) -> Unit = { _, _ -> },
+    toDetail: (MediaItem?, Int) -> Unit = { _, _ -> },
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item { Spacer(modifier = Modifier.height(topHeight + 8.dp)) }
@@ -100,9 +100,9 @@ fun DiscoveryMovieListComponent(
 @Composable
 fun DiscoveryMovieComponent(
     modifier: Modifier = Modifier,
-    movieItem: MovieItem?,
+    movieItem: MediaItem?,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
-    toDetail: (MovieItem?, @MediaType Int) -> Unit = { _, _ -> },
+    toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
     val placeholderBitmap =

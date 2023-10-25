@@ -7,7 +7,7 @@ import androidx.datastore.dataStoreFile
 import androidx.room.Room
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.datastore.ThemeConfigSerializer
-import com.tmdb.movie.db.SearchHistoryDatabase
+import com.tmdb.movie.db.TMDBDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +27,6 @@ object DataStoreModule {
         return context.preferencesDataStore
     }*/
 
-
     @Provides
     @Singleton
     fun provideThemeDataStore(
@@ -41,15 +40,19 @@ object DataStoreModule {
 
     @Provides
     @Singleton
-    fun provideSearchHistoryDatabase(@ApplicationContext context: Context): SearchHistoryDatabase {
+    fun provideTMDBDatabase(@ApplicationContext context: Context): TMDBDatabase {
         return Room.databaseBuilder(
             context = context,
-            klass = SearchHistoryDatabase::class.java,
-            name = SearchHistoryDatabase.DATABASE_NAME
+            klass = TMDBDatabase::class.java,
+            name = TMDBDatabase.DATABASE_NAME
         ).build()
     }
 
     @Provides
-    fun provideSearchHistoryDao(searchHistoryDatabase: SearchHistoryDatabase) =
-        searchHistoryDatabase.searchHistoryDao()
+    fun provideSearchHistoryDao(database: TMDBDatabase) =
+        database.searchHistoryDao()
+
+    @Provides
+    fun providePopularMovieDao(database: TMDBDatabase) =
+        database.popularMovieDao()
 }

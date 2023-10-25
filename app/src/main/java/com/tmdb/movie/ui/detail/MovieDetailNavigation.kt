@@ -21,7 +21,7 @@ internal class MovieArgs(val movieId: Int, @MediaType val type: Int) {
             )
 }
 
-// from 0->home,discovery 1->people home、discovery需要设置显示隐藏BottomBar
+// from 0->home,discovery 1->people   home、discovery需要设置显示隐藏BottomBar
 fun NavController.navigateToMovieDetail(movieId: Int, type: Int = MediaType.MOVIE, from: Int = 0) {
     this.navigate("$movieDetailNavigationRoute/$movieId/$type/$from") {
         launchSingleTop = true

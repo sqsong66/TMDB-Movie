@@ -28,10 +28,10 @@ import kotlinx.coroutines.withContext
 @Composable
 fun BlurHeaderBgComponent(
     modifier: Modifier = Modifier,
-    useBlur: Boolean = false,
+    useBlur: Boolean = true,
     imageUrl: String,
     scaleFactor: Int = 6,
-    blurRadius: Int = 16
+    blurRadius: Int = 16,
 ) {
     val context = LocalContext.current
     var bgImageSize by remember { mutableStateOf(IntSize.Zero) }

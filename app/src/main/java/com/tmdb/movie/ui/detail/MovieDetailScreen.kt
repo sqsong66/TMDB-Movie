@@ -397,6 +397,7 @@ fun MovieDetailTopBar(
         },
         title = {
             Text(
+                modifier = Modifier.padding(start = 16.dp),
                 text = title,
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface.copy(

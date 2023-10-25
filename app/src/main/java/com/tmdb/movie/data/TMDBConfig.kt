@@ -157,7 +157,7 @@ data class TMDBConfig(
                 if (isSmall) {
                     buildImageUrl(ImageType.PROFILE, profileUrl, ImageSize.SMALL)
                 } else {
-                    buildImageUrl(ImageType.PROFILE, profileUrl)
+                    buildImageUrl(ImageType.PROFILE, profileUrl, ImageSize.LARGE)
                 }
             } else {
                 val gravatarHash = it.avatar?.gravatar?.hash

@@ -11,8 +11,14 @@ fun NavController.navigateToMe(navOptions: NavOptions? = null) {
     this.navigate(meNavigationRoute, navOptions)
 }
 
-fun NavGraphBuilder.meScreen(toAuthorize: () -> Unit) {
+fun NavGraphBuilder.meScreen(
+    toAuthorize: () -> Unit,
+    toMyLists: (Int) -> Unit,
+) {
     composable(route = meNavigationRoute) {
-        MeRoute(toAuthorize = toAuthorize)
+        MeRoute(
+            toAuthorize = toAuthorize,
+            toMyLists = toMyLists,
+        )
     }
 }

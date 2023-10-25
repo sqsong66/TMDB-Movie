@@ -104,4 +104,7 @@
     <string name="key_create_list_failed">列表创建失败</string>
     <string name="key_no_videos">没有视频</string>
     <string name="key_casts">演员列表</string>
+    <string name="key_lists">列表</string>
+    <string name="key_ratings">评分</string>
+    <string name="key_watchlist">观看列表</string>
 </resources>

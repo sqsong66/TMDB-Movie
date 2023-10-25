@@ -3,6 +3,9 @@ package com.tmdb.movie.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
@@ -13,10 +16,13 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 object NoRippleTheme : RippleTheme {
@@ -41,6 +47,13 @@ private object TMDBRippleTheme : RippleTheme {
         )
     }
 }
+
+data class FixedInsets(
+    val statusBarHeight: Dp = 0.dp,
+    val navigationBarHeight: Dp = 0.dp,
+)
+
+val LocalFixedInsets = staticCompositionLocalOf { FixedInsets() }
 
 @Composable
 fun TMDBMovieTheme(
@@ -68,10 +81,21 @@ fun TMDBMovieTheme(
         }
     }
 
+    val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
+    val fixedInsets = FixedInsets(
+        statusBarHeight = systemBarsPadding.calculateTopPadding(),
+        navigationBarHeight = systemBarsPadding.calculateBottomPadding()
+    )
+
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography
     ) {
-        CompositionLocalProvider(value = LocalRippleTheme provides TMDBRippleTheme, content = content)
+        CompositionLocalProvider(
+            values = arrayOf(
+                LocalRippleTheme provides TMDBRippleTheme,
+                LocalFixedInsets provides fixedInsets,
+            ), content = content
+        )
     }
 }
