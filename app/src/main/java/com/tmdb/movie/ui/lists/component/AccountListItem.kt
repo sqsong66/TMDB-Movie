@@ -57,7 +57,7 @@ fun AccountListsItem(
     modifier: Modifier = Modifier,
     mediaList: MediaList,
     cachedMovies: List<HomePopularMovie>,
-    toListsDetail: (Int) -> Unit,
+    toListsDetail: (Int, String) -> Unit,
     scaleFactor: Int = 2,
     blurRadius: Int = 6,
     maskColor: Color = MaterialTheme.colorScheme.surfaceVariant,
@@ -92,7 +92,7 @@ fun AccountListsItem(
             .height(120.dp)
             .clip(MaterialTheme.shapes.medium)
             .clickable {
-                toListsDetail(mediaList.id)
+                toListsDetail(mediaList.id, cachedMovies[mediaList.id % cachedMovies.size].backdropPath?.let { onBuildImage(it, ImageType.BACKDROP, ImageSize.MEDIUM) } ?: "")
             },
     ) {
         Box(
@@ -253,7 +253,7 @@ fun AccountListsItemPreview() {
                     updatedAt = "2023-10-23"
                 ),
             ),
-            toListsDetail = {}
+            toListsDetail = { _, _ -> },
         )
     }
 }

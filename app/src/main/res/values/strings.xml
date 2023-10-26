@@ -113,4 +113,7 @@
     <string name="key_ratings">Ratings</string>
     <string name="key_watchlist">Watchlist</string>
     <string name="key_list_items">%d items</string>
+    <string name="key_no_items">No items</string>
+    <string name="key_favorite">Favorite</string>
+    <string name="key_empty_data">No data.</string>
 </resources>

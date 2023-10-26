@@ -38,7 +38,7 @@ import com.tmdb.movie.ui.lists.vm.AccountListsViewModel
 
 @Composable
 fun AccountListsRoute(
-    toListsDetail: (Int) -> Unit,
+    toListsDetail: (Int, String) -> Unit,
     onBackClick: (Boolean) -> Unit,
     viewModel: AccountListsViewModel = hiltViewModel(),
 ) {
@@ -61,7 +61,7 @@ fun AccountListsRoute(
 
 @Composable
 fun AccountListsScreen(
-    toListsDetail: (Int) -> Unit,
+    toListsDetail: (Int, String) -> Unit,
     onBackClick: (Boolean) -> Unit,
     cachedMovies: List<HomePopularMovie>,
     accountLists: LazyPagingItems<MediaList>,

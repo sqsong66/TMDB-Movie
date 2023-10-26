@@ -82,13 +82,13 @@ interface ApiService {
     @GET("movie/{id}/images")
     suspend fun getMovieImages(
         @Path("id") id: Int,
-        @Query("language") language: String = getLanguage(),
+       // @Query("language") language: String = getLanguage(),
     ): ImagesData
 
     @GET("tv/{id}/images")
     suspend fun getTVImages(
         @Path("id") id: Int,
-        @Query("language") language: String = getLanguage(),
+        // @Query("language") language: String = getLanguage(),
     ): ImagesData
 
     @GET("person/{id}")
@@ -158,4 +158,22 @@ interface ApiService {
 
     @GET("list/{list_id}")
     suspend fun getListsDetail(@Path("list_id") listId: Int, @Query("language") language: String = getLanguage()): ListsDetail
+
+    @GET("account/{account_id}/favorite/movies")
+    suspend fun getFavoriteMovies(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+
+    @GET("account/{account_id}/favorite/tv")
+    suspend fun getFavoriteTV(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+
+    @GET("account/{account_id}/watchlist/movies")
+    suspend fun getWatchlistMovies(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+
+    @GET("account/{account_id}/watchlist/tv")
+    suspend fun getWatchlistTV(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+
+    @GET("account/{account_id}/rated/movies")
+    suspend fun getRatedMovies(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+
+    @GET("account/{account_id}/rated/tv")
+    suspend fun getRatedTV(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
 }

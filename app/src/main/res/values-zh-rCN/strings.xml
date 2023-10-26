@@ -107,4 +107,8 @@
     <string name="key_lists">列表</string>
     <string name="key_ratings">评分</string>
     <string name="key_watchlist">观看列表</string>
+    <string name="key_list_items">%d 条数据</string>
+    <string name="key_no_items">暂无数据</string>
+    <string name="key_favorite">喜爱</string>
+    <string name="key_empty_data">暂无数据</string>
 </resources>

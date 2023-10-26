@@ -20,7 +20,7 @@ fun NavController.navigateToAccountLists(accountId: Int, navOptions: NavOptions?
 }
 
 fun NavGraphBuilder.accountListsScreen(
-    toListsDetail: (Int) -> Unit,
+    toListsDetail: (Int, String) -> Unit,
     onBackClick: (Boolean) -> Unit,
 ) {
     composable(

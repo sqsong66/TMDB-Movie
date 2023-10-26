@@ -8,6 +8,7 @@ import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.FavoriteParam
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaList
+import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.Result
 import com.tmdb.movie.data.TMDBConfig
@@ -165,7 +166,7 @@ class MovieDetailViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val addListTrigger: StateFlow<AddListUiState> = triggerAddListChannel.receiveAsFlow()
         .flatMapLatest {
-            repository.addMediaToList(it.sessionId, it.mediaId, it.listId)
+            repository.addMediaToList(it.sessionId, it.mediaId, it.listId, if (mediaType == MediaType.MOVIE) "movie" else "tv")
         }.map {
             when (it) {
                 is Result.Success -> {

@@ -15,7 +15,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.tmdb.movie.component.rememberCurrentOffset
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.ListsDetail
@@ -32,6 +31,7 @@ import com.tmdb.movie.ui.theme.TMDBMovieTheme
 
 @Composable
 fun ListsDetailRoute(
+    coverImageUrl: String,
     toMediaDetail: (Int, @MediaType Int) -> Unit,
     onBackClick: (Boolean) -> Unit,
     viewModel: ListsDetailViewModel = hiltViewModel(),
@@ -42,6 +42,7 @@ fun ListsDetailRoute(
 
     ListsDetailScreen(
         uiState = uiState,
+        coverImageUrl = coverImageUrl,
         toMediaDetail = toMediaDetail,
         onBackClick = onBackClick,
         onBuildImage = { url, type, size ->
@@ -52,6 +53,7 @@ fun ListsDetailRoute(
 
 @Composable
 fun ListsDetailScreen(
+    coverImageUrl: String,
     uiState: ListsDetailUiState,
     toMediaDetail: (Int, @MediaType Int) -> Unit,
     onBackClick: (Boolean) -> Unit,
@@ -64,13 +66,14 @@ fun ListsDetailScreen(
             ListsDetailUiState.Loading -> {
                 ListsDetailTopBar(
                     modifier = Modifier,
-                    scrollValue = -1f,
+                    gridState = rememberLazyGridState(),
                     topBarBottom = 0f,
                     onBackClick = onBackClick,
                 )
             }
 
             is ListsDetailUiState.Success -> ListsDetailContent(
+                coverImageUrl = coverImageUrl,
                 onBackClick = onBackClick,
                 listsDetail = uiState.data,
                 onBuildImage = onBuildImage,
@@ -87,15 +90,16 @@ fun ListsDetailContent(
     listsDetail: ListsDetail,
     toMediaDetail: (Int, @MediaType Int) -> Unit,
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
+    coverImageUrl: String,
 ) {
 
-    val listState = rememberLazyGridState()
-    val scrollValue = rememberCurrentOffset(listState)
-    var headerHeight by remember { mutableFloatStateOf(600f) }
+    val lazyGridState = rememberLazyGridState()
+    // val scrollValue = rememberCurrentOffset(listState)
+    var headerHeight by remember { mutableFloatStateOf(620f) }
     var topBarHeight by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(headerHeight) {
-        listState.scrollToItem(0)
+        lazyGridState.scrollToItem(0)
     }
 
     ListsDetailHeader(
@@ -104,14 +108,13 @@ fun ListsDetailContent(
                 headerHeight = it.size.height.toFloat()
             },
         headerHeight = headerHeight,
-        scrollValue = scrollValue.value.toFloat(),
-        mediaItem = listsDetail.items?.firstOrNull(),
-        onBuildImage = onBuildImage,
+        gridState = lazyGridState,
+        coverImageUrl = coverImageUrl,
     )
 
     ListsDetailBody(
         modifier = Modifier,
-        listState = listState,
+        listState = lazyGridState,
         headerHeight = headerHeight.pxToDp(),
         listsDetail = listsDetail,
         onBuildImage = onBuildImage,
@@ -122,14 +125,14 @@ fun ListsDetailContent(
         modifier = Modifier.onGloballyPositioned {
             topBarHeight = it.size.height.toFloat()
         },
-        scrollValue = scrollValue.value.toFloat(),
+        gridState = lazyGridState,
         topBarBottom = headerHeight - topBarHeight,
         onBackClick = onBackClick,
     )
 
     ListsDetailTitle(
         title = listsDetail.name ?: "",
-        scrollValue = scrollValue.value.toFloat(),
+        gridState = lazyGridState,
         headerHeight = headerHeight.pxToDp(),
         topBarHeight = topBarHeight.pxToDp(),
     )
@@ -141,15 +144,13 @@ fun ListsDetailContent(
 fun ListsDetailScreenPreview() {
     TMDBMovieTheme {
         ListsDetailScreen(
-            toMediaDetail = { _, _ -> },
-            onBackClick = { },
             uiState = ListsDetailUiState.Success(
                 ListsDetail(
                     id = 1,
                     name = "Loved Movies",
                     description = "My love moive lists.",
                     posterPath = "",
-                    itemCount = 1,
+                    itemCount = 0,
                     favoriteCount = 0,
                     iso6391 = "",
                     createdBy = "",
@@ -167,7 +168,10 @@ fun ListsDetailScreenPreview() {
                         )
                     )
                 )
-            )
+            ),
+            toMediaDetail = { _, _ -> },
+            onBackClick = { },
+            coverImageUrl = ""
         )
     }
 }

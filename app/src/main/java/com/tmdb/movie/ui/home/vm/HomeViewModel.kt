@@ -1,6 +1,5 @@
 package com.tmdb.movie.ui.home.vm
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -116,9 +114,9 @@ class HomeViewModel @Inject constructor(
                     else -> MovieLoadState.Loading()
                 }
             }
-            .onCompletion {
+            /*.onCompletion {
                 Log.w("sqsong", "HomeViewModel buildNetworkStateFlow onCompletion: $it, queryFlow: $queryFlow")
-            }
+            }*/
             .stateIn(
                 scope = viewModelScope,
                 initialValue = MovieLoadState.Loading(),
@@ -156,11 +154,6 @@ class HomeViewModel @Inject constructor(
             triggerChannel5.trySend(true)
             triggerChannel6.trySend(true)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        Log.e("sqsong", "HomeViewModel onCleared: ")
     }
 
 }

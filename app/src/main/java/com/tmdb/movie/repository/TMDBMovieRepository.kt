@@ -28,6 +28,7 @@ import com.tmdb.movie.data.WatchlistRequest
 import com.tmdb.movie.data.asResult
 import com.tmdb.movie.db.PopularMovieDao
 import com.tmdb.movie.network.ApiService
+import com.tmdb.movie.paging.AccountMediaListsPagingSource
 import com.tmdb.movie.paging.DiscoveryMoviePagingSource
 import com.tmdb.movie.paging.MyMediaListPagingSource
 import com.tmdb.movie.paging.SearchMoviePagingSource
@@ -232,8 +233,8 @@ class TMDBMovieRepository @Inject constructor(
         emit(true)
     }.asResult()
 
-    override fun getAccountState(id: Int, sessionId: String, movieType: Int): Flow<Result<AccountState>> = flow {
-        val accountState = if (movieType == 0) {
+    override fun getAccountState(id: Int, sessionId: String, mediaType: Int): Flow<Result<AccountState>> = flow {
+        val accountState = if (mediaType == MediaType.MOVIE) {
             apiService.getMovieAccountState(id, sessionId)
         } else {
             apiService.getTVAccountState(id, sessionId)
@@ -241,9 +242,9 @@ class TMDBMovieRepository @Inject constructor(
         emit(accountState)
     }.asResult()
 
-    override fun markAsFavorite(accountId: Int, sessionId: String, movieType: Int, mediaId: Int, favorite: Boolean): Flow<Result<Boolean>> =
+    override fun markAsFavorite(accountId: Int, sessionId: String, mediaType: Int, mediaId: Int, favorite: Boolean): Flow<Result<Boolean>> =
         flow {
-            val newMediaType = if (movieType == MediaType.MOVIE) "movie" else "tv"
+            val newMediaType = if (mediaType == MediaType.MOVIE) "movie" else "tv"
             val request = FavoriteRequest(mediaType = newMediaType, mediaId = mediaId, favorite = favorite)
             val result = apiService.addToFavorite(accountId, request)
             if (!result.success) throw Exception("Change favorite state error: ${result.statusMessage}.")
@@ -264,9 +265,9 @@ class TMDBMovieRepository @Inject constructor(
         emit(mediaLists.results)
     }.asResult()
 
-    override fun addMediaToList(sessionId: String, mediaId: Int, listId: Int): Flow<Result<ResponseResult>> {
+    override fun addMediaToList(sessionId: String, mediaId: Int, listId: Int, mediaType: String): Flow<Result<ResponseResult>> {
         return flow {
-            emit(apiService.addMediaToList(listId, sessionId, MediaIdRequest(mediaId)))
+            emit(apiService.addMediaToList(listId, sessionId, MediaIdRequest(mediaId, mediaType)))
         }.asResult()
     }
 
@@ -291,5 +292,9 @@ class TMDBMovieRepository @Inject constructor(
             it.copy(userData = userData.copy(sessionId = sessionId))
         }
         return userData
+    }
+
+    override fun getAccountMediaListsPagingSource(accountId: Int, mediaType: Int, accountMediaType: Int): AccountMediaListsPagingSource {
+        return AccountMediaListsPagingSource(apiService, accountId, mediaType, accountMediaType)
     }
 }

@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import com.tmdb.movie.data.AccountMediaType
 
 const val meNavigationRoute = "me_navigation_route"
 
@@ -13,12 +14,14 @@ fun NavController.navigateToMe(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.meScreen(
     toAuthorize: () -> Unit,
-    toMyLists: (Int) -> Unit,
+    toAccountLists: (Int) -> Unit,
+    toAccountMediaLists: (Int, @AccountMediaType Int) -> Unit,
 ) {
     composable(route = meNavigationRoute) {
         MeRoute(
             toAuthorize = toAuthorize,
-            toMyLists = toMyLists,
+            toAccountLists = toAccountLists,
+            toAccountMediaLists = toAccountMediaLists,
         )
     }
 }

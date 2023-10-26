@@ -48,8 +48,8 @@ import com.tmdb.movie.component.ErrorPage
 import com.tmdb.movie.component.LoadingError
 import com.tmdb.movie.component.LoadingFooter
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MediaItem
+import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 
 @Composable
@@ -104,16 +104,21 @@ fun DiscoveryTVListComponent(
         }
 
         when (movieList?.loadState?.append) {
-            is LoadState.Error -> item { LoadingError { movieList.retry() } }
-            LoadState.Loading -> item { LoadingFooter() }
+            is LoadState.Error -> item(
+                span = {
+                    GridItemSpan(2)
+                }
+            ) { LoadingError { movieList.retry() } }
+
+            LoadState.Loading -> item(
+                span = {
+                    GridItemSpan(2)
+                }
+            ) { LoadingFooter() }
+
             else -> {}
         }
 
-        when (movieList?.loadState?.append) {
-            is LoadState.Error -> item { LoadingError { movieList.retry() } }
-            LoadState.Loading -> item { LoadingFooter() }
-            else -> {}
-        }
         item(
             span = {
                 GridItemSpan(2)

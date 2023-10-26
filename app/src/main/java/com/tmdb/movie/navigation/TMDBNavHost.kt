@@ -13,6 +13,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import com.tmdb.movie.R
+import com.tmdb.movie.ui.account.accountMediaListScreen
+import com.tmdb.movie.ui.account.navigateToAccountMediaList
 import com.tmdb.movie.ui.app.TMDBAppState
 import com.tmdb.movie.ui.detail.movieDetailScreen
 import com.tmdb.movie.ui.detail.navigateToMovieDetail
@@ -117,18 +119,22 @@ fun TMDBNavHost(
             toAuthorize = {
                 isShowAuthenticationDialog = true
             },
-            toMyLists = {
+            toAccountLists = {
                 onShowBottomBar(false)
                 navController.navigateToAccountLists(it)
             },
+            toAccountMediaLists = { accountId, accountMediaType ->
+                onShowBottomBar(false)
+                navController.navigateToAccountMediaList(accountId, accountMediaType)
+            }
         )
         peopleDetailScreen(onBackClick = onBackClick, toMovieDetail = { movieId, type ->
             navController.navigateToMovieDetail(movieId, type, from = 1)
         })
         createListScreen(onBackClick = onBackClick)
         accountListsScreen(
-            toListsDetail = {
-                navController.navigateToListsDetail(it)
+            toListsDetail = { id, coverImageUrl ->
+                navController.navigateToListsDetail(id, coverImageUrl)
             },
             onBackClick = onBackClick
         )
@@ -137,6 +143,12 @@ fun TMDBNavHost(
                 navController.navigateToMovieDetail(id, type, from = 1)
             },
             onBackClick = onBackClick
+        )
+        accountMediaListScreen(
+            onBackClick = onBackClick,
+            toMediaDetail = { id, type ->
+                navController.navigateToMovieDetail(id, type, from = 1)
+            }
         )
     }
 }

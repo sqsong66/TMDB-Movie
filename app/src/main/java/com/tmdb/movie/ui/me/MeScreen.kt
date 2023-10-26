@@ -45,6 +45,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tmdb.movie.R
 import com.tmdb.movie.component.BlurHeaderBgComponent
+import com.tmdb.movie.data.AccountMediaType
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.UserData
 import com.tmdb.movie.ui.me.dialog.SignOutConfirmDialog
@@ -55,7 +56,8 @@ import com.tmdb.movie.ui.theme.TMDBMovieTheme
 @Composable
 fun MeRoute(
     toAuthorize: () -> Unit,
-    toMyLists: (Int) -> Unit,
+    toAccountLists: (Int) -> Unit,
+    toAccountMediaLists: (Int, @AccountMediaType Int) -> Unit,
     viewModel: MeViewModel = hiltViewModel()
 ) {
 
@@ -93,7 +95,8 @@ fun MeRoute(
         )
     }
 
-    MeScreen(config = configStream,
+    MeScreen(
+        config = configStream,
         onAvatarClick = {
             if (configStream.isLogin()) return@MeScreen
             toAuthorize()
@@ -111,10 +114,13 @@ fun MeRoute(
         avatarUrl = avatarUrl,
         onClickLists = {
             if (configStream.isLogin()) {
-                toMyLists(configStream.userData?.id ?: 0)
+                toAccountLists(configStream.userData?.id ?: 0)
             } else {
                 toAuthorize()
             }
+        },
+        toMediaLists = {
+            toAccountMediaLists(configStream.userData?.id ?: 0, it)
         }
     )
 }
@@ -126,6 +132,7 @@ fun MeScreen(
     onChangeTheme: () -> Unit,
     onSignOut: () -> Unit,
     onClickLists: () -> Unit,
+    toMediaLists: (@AccountMediaType Int) -> Unit,
     avatarUrl: String = "",
     onBuildAvatar: () -> String = { "" },
 ) {
@@ -212,11 +219,6 @@ fun MeScreen(
                 Spacer(modifier = Modifier.weight(1f))
             }
 
-            /*Divider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-            )*/
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -260,12 +262,37 @@ fun MeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable { toMediaLists(AccountMediaType.FAVORITE) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+                    painter = painterResource(id = R.drawable.outline_favorite_24),
+                    contentDescription = "List",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = stringResource(id = R.string.key_favorite),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
 
-                        )
+            Divider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+            )
 
-                    .clickable { onClickLists() },
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable { toMediaLists(AccountMediaType.RATED) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -299,12 +326,8 @@ fun MeScreen(
                             bottomStart = 8.dp, bottomEnd = 8.dp
                         )
                     )
-                    .clip(
-                        shape = RoundedCornerShape(
-                            bottomStart = 8.dp, bottomEnd = 8.dp
-                        )
-                    )
-                    .clickable { onClickLists() },
+                    .clip(shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp))
+                    .clickable { toMediaLists(AccountMediaType.WATCHLIST) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -356,7 +379,7 @@ fun MeScreen(
 }
 
 @Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, locale = "zh")
 @Composable
 fun MeScreenPreview() {
     TMDBMovieTheme {
@@ -367,7 +390,8 @@ fun MeScreenPreview() {
             onAvatarClick = {},
             onChangeTheme = {},
             onSignOut = {},
-            onClickLists = {}
+            onClickLists = {},
+            toMediaLists = {}
         )
     }
 }

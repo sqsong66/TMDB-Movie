@@ -76,8 +76,10 @@ android {
     }
 }
 
+
 configurations.all {
     resolutionStrategy {
+         force("androidx.compose.material:material:1.6.0-alpha08")
 //         force("androidx.compose.foundation:foundation:1.6.0-alpha07")
 //         force("androidx.compose.foundation:foundation-layout:1.6.0-alpha07")
     }

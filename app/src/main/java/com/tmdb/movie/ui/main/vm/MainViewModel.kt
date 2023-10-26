@@ -38,7 +38,11 @@ class MainViewModel @Inject constructor(
             val config = it.config
             if (config.isLogin()) {
                 config.userData?.sessionId?.let { id ->
-                    movieRepository.updateUserData(id)
+                    try {
+                        movieRepository.updateUserData(id)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
                 }
             }
             it

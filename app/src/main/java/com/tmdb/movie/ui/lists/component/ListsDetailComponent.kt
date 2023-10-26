@@ -3,15 +3,19 @@ package com.tmdb.movie.ui.lists.component
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -33,13 +37,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -58,6 +62,8 @@ import coil.request.ImageRequest
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.tmdb.movie.R
+import com.tmdb.movie.component.myiconpack.emptyDataVector
+import com.tmdb.movie.component.rememberCurrentOffset
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.ListsDetail
@@ -79,35 +85,28 @@ private const val titleFontScaleEnd = 0.66f
 fun ListsDetailHeader(
     modifier: Modifier = Modifier,
     headerHeight: Float,
-    scrollValue: Float,
-    mediaItem: MediaItem? = null,
-    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
+    gridState: LazyGridState,
+    coverImageUrl: String,
 ) {
 
-    // Log.w("sqsong", "ListsDetailHeader compose.....")
+    val scrollValue by rememberCurrentOffset(gridState)
     val context = LocalContext.current
     val placeholderBitmap =
         AppCompatResources.getDrawable(context, R.drawable.image_placeholder_horizontal)?.toBitmap()?.apply {
             eraseColor(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f).toArgb())
         }
+
     Box(modifier = Modifier.fillMaxWidth()) {
         AsyncImage(
             modifier = modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    translationY = -scrollValue / 2
+                    translationY = -scrollValue.toFloat() / 2
                     alpha = (-1f / headerHeight) * scrollValue + 1
+                    Log.w("sqsong", "ListsDetailHeader compose: alpha: $alpha.....")
                 },
             model = ImageRequest.Builder(LocalContext.current)
-                .data(
-                    mediaItem?.let {
-                        onBuildImage(
-                            it.backdropPath,
-                            ImageType.BACKDROP,
-                            ImageSize.MEDIUM
-                        )
-                    }
-                )
+                .data(coverImageUrl)
                 .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
                 .error(BitmapDrawable(context.resources, placeholderBitmap))
                 .crossfade(true)
@@ -135,10 +134,11 @@ fun ListsDetailHeader(
 @Composable
 fun ListsDetailTopBar(
     modifier: Modifier = Modifier,
-    scrollValue: Float,
+    gridState: LazyGridState,
     topBarBottom: Float,
     onBackClick: (Boolean) -> Unit,
 ) {
+    val scrollValue by rememberCurrentOffset(gridState)
 
     TopAppBar(
         modifier = modifier,
@@ -163,20 +163,20 @@ fun ListsDetailTopBar(
 fun ListsDetailTitle(
     modifier: Modifier = Modifier,
     title: String,
-    scrollValue: Float,
+    gridState: LazyGridState,
     headerHeight: Dp,
     topBarHeight: Dp,
 ) {
     var titleHeightPx by remember { mutableFloatStateOf(0f) }
     var titleWidthPx by remember { mutableFloatStateOf(0f) }
-
+    val scrollValue by rememberCurrentOffset(gridState)
     val statusBarHeight = LocalFixedInsets.current.statusBarHeight
 
     Text(
         text = title,
         fontSize = 30.sp,
         fontWeight = FontWeight.Bold,
-        color = Color.White,
+        color = MaterialTheme.colorScheme.onBackground,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
@@ -285,18 +285,51 @@ fun ListsDetailBody(
             )
         }
 
-        items(listsDetail.itemCount) { index ->
-            ListsDetailBodyItem(
-                modifier = Modifier.padding(
-                    top = if (index < 2) 16.dp else 0.dp,
-                    start = if (index % 2 == 0) 16.dp else 8.dp,
-                    end = if (index % 2 == 1) 16.dp else 8.dp,
-                    bottom = 16.dp
-                ),
-                mediaItem = listsDetail.items?.get(index) ?: MediaItem(),
-                onBuildImage = onBuildImage,
-                toMediaDetail = toMediaDetail,
-            )
+        if (listsDetail.itemCount <= 0) {
+            item(span = {
+                GridItemSpan(2)
+            }) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 150.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .align(Alignment.CenterHorizontally),
+                        imageVector = emptyDataVector(
+                            primaryColor = MaterialTheme.colorScheme.primary,
+                            backgroundColor = MaterialTheme.colorScheme.background
+                        ),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillWidth
+                    )
+                    androidx.compose.material3.Text(
+                        text = stringResource(R.string.key_no_items),
+                        modifier = Modifier.padding(top = 16.dp),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    )
+                }
+            }
+        } else {
+            items(listsDetail.itemCount) { index ->
+                ListsDetailBodyItem(
+                    modifier = Modifier.padding(
+                        top = if (index < 2) 16.dp else 0.dp,
+                        start = if (index % 2 == 0) 16.dp else 8.dp,
+                        end = if (index % 2 == 1) 16.dp else 8.dp,
+                        bottom = 16.dp
+                    ),
+                    mediaItem = listsDetail.items?.get(index) ?: MediaItem(),
+                    onBuildImage = onBuildImage,
+                    toMediaDetail = toMediaDetail,
+                )
+            }
         }
     }
 }

@@ -53,11 +53,11 @@ data class MediaItem(
     val episodeCount: Int = 0,
 ) : Parcelable {
 
-    fun getMovieName(@MediaType mediaType: Int): String? {
+    fun getMovieName(@MediaType mediaType: Int): String {
         return if (mediaType == MediaType.MOVIE) {
-            title ?: originalTitle
+            title ?: originalTitle ?: ""
         } else {
-            name ?: originalName
+            name ?: originalName ?: ""
         }
     }
 
