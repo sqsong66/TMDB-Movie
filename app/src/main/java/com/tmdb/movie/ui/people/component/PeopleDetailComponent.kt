@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -297,7 +298,7 @@ fun PeopleCastComponent(
                             )
                         )
                     } else {
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.width(12.dp),
                             thickness = 2.dp,
                             color = MaterialTheme.colorScheme.primary
@@ -311,11 +312,11 @@ fun PeopleCastComponent(
                         .size(45.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Divider(
-                        color = MaterialTheme.colorScheme.primary,
+                    HorizontalDivider(
                         modifier = Modifier
                             .width(1.dp)
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Box(
                         modifier = Modifier

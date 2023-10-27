@@ -112,6 +112,12 @@ fun TMDBNavHost(
                     },
                     onCreateList = {
                         navController.navigateToCreateList()
+                    },
+                    toSeasonDetail = { backdropPath, tvId, seasonNum ->
+
+                    },
+                    toEpisodeDetail = { backdropPath, tvId, seasonNum, episodeNum ->
+
                     }
                 )
             })

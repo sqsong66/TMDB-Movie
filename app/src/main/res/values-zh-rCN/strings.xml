@@ -35,7 +35,8 @@
     <string name="key_vote_point">用户评分</string>
     <string name="key_release_date">上映时间</string>
     <string name="key_overview">概览</string>
-    <string name="key_main_cast">主演</string>
+    <string name="key_top_billed_cast">主演</string>
+    <string name="key_series_cast">剧集演员</string>
     <string name="key_movie_videos">视频</string>
     <string name="key_popularity">人气</string>
     <string name="key_first_air_date">首播时间</string>
@@ -111,4 +112,10 @@
     <string name="key_no_items">暂无数据</string>
     <string name="key_favorite">喜爱</string>
     <string name="key_empty_data">暂无数据</string>
+    <string name="key_view_all_seasons">所有剧季</string>
+    <string name="key_view_last_season">最新一季</string>
+    <string name="key_view_current_season">当前季</string>
+    <string name="key_year_episodes">%1$s&#160;•&#160;%2$d 集</string>
+    <string name="key_season_finale">最终季</string>
+    <string name="key_season_desc">《%2$s》%1$s于 %3$s 首播。</string>
 </resources>

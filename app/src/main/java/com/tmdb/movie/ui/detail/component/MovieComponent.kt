@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -354,6 +355,7 @@ fun MovieOverviewLayout(
 @Composable
 fun MovieCastLayout(
     modifier: Modifier = Modifier,
+    isTv: Boolean,
     castList: List<Cast>,
     onBuildImage: (String?, @ImageType Int) -> String? = { url, _ -> url },
     onMoreCasts: (List<Cast>) -> Unit,
@@ -365,7 +367,7 @@ fun MovieCastLayout(
     ) {
         ProfileTitleComponent(
             modifier = Modifier,
-            title = stringResource(R.string.key_main_cast),
+            title = stringResource(if (isTv) R.string.key_series_cast else R.string.key_top_billed_cast),
             showMoreText = castList.size > 10,
             moreText = stringResource(id = R.string.key_view_all),
             onMoreTextClick = { onMoreCasts(castList) }
@@ -521,14 +523,14 @@ fun VideoPagerComponent(
         Image(
             modifier = Modifier
                 .size(width = 60.dp, height = 40.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .background(
-                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
                 )
                 .padding(horizontal = 16.dp, vertical = if (video.isYoutube()) 6.dp else 10.dp),
             painter = painterResource(id = if (video.isYoutube()) R.drawable.logo_youtube else R.drawable.logo_vimeo),
             contentDescription = "",
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
+            colorFilter = ColorFilter.tint(Color.Red)
         )
     }
 }
@@ -653,7 +655,7 @@ fun MovieVideoComponentPreview2() {
 }
 
 @Composable
-fun MovieDetailLoadingComponent() {
+fun MovieDetailLoadingComponent(isTv: Boolean = false) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -988,7 +990,7 @@ fun MovieDetailLoadingComponent() {
                 .padding(top = 24.dp)
         ) {
             Text(
-                text = stringResource(R.string.key_main_cast),
+                text = stringResource(R.string.key_top_billed_cast),
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .placeholder(
@@ -1038,48 +1040,13 @@ fun MovieDetailLoadingComponent() {
             }
         }
 
-        // VideLayout
-        /*Text(
-            text = buildAnnotatedString {
-                append("Videos")
-            },
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(start = 16.dp, top = 24.dp)
-                .placeholder(
-                    visible = true,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                    shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.shimmer(
-                        highlightColor = PlaceholderDefaults.shimmerHighlightColor(
-                            alpha = 0.25f
-                        )
-                    )
+        if (isTv) {
+            LatestSeasonComponentPlaceholder(
+                modifier = Modifier.padding(
+                    top = 24.dp,
+                    bottom = 16.dp
                 ),
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold
             )
-        )
-
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, start = 16.dp, end = 16.dp, bottom = 24.dp)
-                .height(180.dp)
-                .placeholder(
-                    visible = true,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                    shape = MaterialTheme.shapes.medium,
-                    highlight = PlaceholderHighlight.shimmer(
-                        highlightColor = PlaceholderDefaults.shimmerHighlightColor(
-                            alpha = 0.25f
-                        )
-                    )
-                )
-                .clip(MaterialTheme.shapes.medium),
-            painter = painterResource(id = R.drawable.image_placeholder_horizontal),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-        )*/
+        }
     }
 }

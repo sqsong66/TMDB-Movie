@@ -37,13 +37,13 @@ data class MovieDetails(
     @SerializedName("last_air_date")
     val lastAirDate: String? = null,
     @SerializedName("last_episode_to_air")
-    val lastEpisodeToAir: LastEpisodeToAir? = null,
+    val lastEpisodeToAir: EpisodeToAir? = null,
     @SerializedName("name")
     val name: String? = null,
     @SerializedName("networks")
     val networks: List<Network>? = null,
     @SerializedName("next_episode_to_air")
-    val nextEpisodeToAir: LastEpisodeToAir? = null,
+    val nextEpisodeToAir: EpisodeToAir? = null,
     @SerializedName("number_of_episodes")
     val numberOfEpisodes: Int = 0,
     @SerializedName("number_of_seasons")
@@ -188,7 +188,7 @@ data class CreatedBy(
     val profilePath: String? = null
 )
 
-data class LastEpisodeToAir(
+data class EpisodeToAir(
     @SerializedName("air_date")
     val airDate: String? = null,
     @SerializedName("episode_number")
@@ -215,7 +215,23 @@ data class LastEpisodeToAir(
     val voteAverage: Float = 0.0f,
     @SerializedName("vote_count")
     val voteCount: Int = 0
-)
+) {
+    fun isLastEpisode(): Boolean {
+        return episodeType == "finale"
+    }
+
+    fun getSeasonOverview(context: Context): String {
+        return if (overview.isNullOrEmpty()) {
+            context.getString(R.string.key_no_overview)
+        } else {
+            overview.trim()
+        }
+    }
+
+    fun niceAirDate(): String {
+        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: ""
+    }
+}
 
 data class Network(
     @SerializedName("id")
@@ -245,4 +261,18 @@ data class Season(
     val seasonNumber: Int = 0,
     @SerializedName("vote_average")
     val voteAverage: Float = 0.0f
-)
+) {
+
+    fun getSeasonOverview(context: Context): String {
+        return if (overview.isNullOrEmpty()) {
+            context.getString(R.string.key_no_overview)
+        } else {
+            overview.trim()
+        }
+    }
+
+    fun niceAirDate(): String {
+        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: ""
+    }
+
+}

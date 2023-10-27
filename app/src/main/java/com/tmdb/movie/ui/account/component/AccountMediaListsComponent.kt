@@ -7,18 +7,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,19 +38,16 @@ fun AccountMediaListsTopBar(
         modifier = modifier,
         title = {
             Text(
-                modifier = Modifier.padding(start = 16.dp),
-                text = stringResource(
+                modifier = Modifier.padding(start = 16.dp), text = stringResource(
                     id = when (accountMediaType) {
                         AccountMediaType.FAVORITE -> R.string.key_favorite
                         AccountMediaType.WATCHLIST -> R.string.key_watchlist
                         else -> R.string.key_ratings
                     }
-                ),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                ), style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Medium,
+                ), maxLines = 1, overflow = TextOverflow.Ellipsis
             )
         },
         navigationIcon = {
@@ -58,14 +55,10 @@ fun AccountMediaListsTopBar(
                 onBackClick(true)
             }) {
                 Icon(
-                    painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-                    contentDescription = ""
+                    painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription = ""
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        )
     )
 }
 
@@ -77,38 +70,37 @@ fun AccountMediaListsTabRow(
     onTabSelected: (Int) -> Unit = {},
 ) {
 
-    TabRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
+    PrimaryTabRow(modifier = modifier
+        .fillMaxWidth()
+        .padding(bottom = 8.dp),
         selectedTabIndex = selectedTabIndex,
         containerColor = Color.Transparent,
         indicator = { tabPositions ->
             if (selectedTabIndex < tabPositions.size) {
-                TabRowDefaults.Indicator(
+                TabRowDefaults.PrimaryIndicator(
                     modifier = Modifier
-                        .customTabIndicatorOffset(tabPositions[selectedTabIndex], 50.dp)
+                        .customTabIndicatorOffset(tabPositions[selectedTabIndex], 60.dp)
                         .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)),
-                    height = 4.dp
+                    height = 3.dp,
                 )
             }
-        },
-        divider = {}
-    ) {
+        }) {
         tabLists.forEachIndexed { index, title ->
-            Tab(modifier = Modifier,
+            Tab(
                 selected = index == selectedTabIndex,
-                onClick = { onTabSelected(index) }
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(top = 16.dp, bottom = 12.dp, start = 16.dp, end = 16.dp),
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = if (index == selectedTabIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                    ),
-                )
-            }
+                onClick = { onTabSelected(index) },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = if (index == 0) R.drawable.outline_movie_24 else R.drawable.outline_tv_24),
+                        contentDescription = ""
+                    )
+                },
+                text = {
+                    Text(text = title)
+                },
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
 }
@@ -118,8 +110,7 @@ fun AccountMediaListsTabRow(
 fun AccountMediaListsTopBarPreview() {
     TMDBMovieTheme {
         AccountMediaListsTopBar(
-            onBackClick = {},
-            accountMediaType = AccountMediaType.FAVORITE
+            onBackClick = {}, accountMediaType = AccountMediaType.FAVORITE
         )
     }
 }
@@ -129,8 +120,7 @@ fun AccountMediaListsTopBarPreview() {
 fun AccountMediaListsTabRowPreview() {
     TMDBMovieTheme {
         AccountMediaListsTabRow(
-            tabLists = listOf("Movies", "TV Shows"),
-            selectedTabIndex = 0
+            tabLists = listOf("Movies", "TV Shows"), selectedTabIndex = 0
         )
     }
 }

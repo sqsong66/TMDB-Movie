@@ -33,6 +33,8 @@ fun NavGraphBuilder.movieDetailScreen(
     onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
+    toSeasonDetail: (String, Int, Int) -> Unit,
+    toEpisodeDetail: (String, Int, Int, Int) -> Unit,
 ) {
     composable(
         route = "$movieDetailNavigationRoute/{$movieIdArg}/{$movieTypeArg}/{$movieFromArg}",
@@ -58,7 +60,9 @@ fun NavGraphBuilder.movieDetailScreen(
             toLogin = toLogin,
             onBackClick = onBackClick,
             onCreateList = onCreateList,
-            onNavigateToPeopleDetail = onNavigateToPeopleDetail
+            onNavigateToPeopleDetail = onNavigateToPeopleDetail,
+            toSeasonDetail = toSeasonDetail,
+            toEpisodeDetail = toEpisodeDetail,
         )
     }
 }

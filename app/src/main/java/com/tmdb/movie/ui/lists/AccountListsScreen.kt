@@ -11,7 +11,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -77,7 +76,12 @@ fun AccountListsScreen(
                 val item = accountLists[index]
                 if (item != null) {
                     AccountListsItem(
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = if (index == accountLists.itemCount - 1) 16.dp else 0.dp
+                        ),
                         mediaList = item,
                         cachedMovies = cachedMovies,
                         onBuildImage = onBuildImage,
@@ -140,8 +144,8 @@ fun AccountListsTopBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
+        /*colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        )
+        )*/
     )
 }

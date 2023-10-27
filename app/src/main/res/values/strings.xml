@@ -40,7 +40,8 @@
     <string name="key_vote_point">User Score</string>
     <string name="key_release_date">Release Date</string>
     <string name="key_overview">Overview</string>
-    <string name="key_main_cast">Main Cast</string>
+    <string name="key_top_billed_cast">Top Billed Cast</string>
+    <string name="key_series_cast">Series Cast</string>
     <string name="key_movie_videos">Videos</string>
     <string name="key_popularity">Popularity</string>
     <string name="key_first_air_date">First Air Date</string>
@@ -116,4 +117,10 @@
     <string name="key_no_items">No items</string>
     <string name="key_favorite">Favorite</string>
     <string name="key_empty_data">No data.</string>
+    <string name="key_view_all_seasons">View All Seasons</string>
+    <string name="key_view_last_season">Last Season</string>
+    <string name="key_view_current_season">Current Season</string>
+    <string name="key_year_episodes">%1$s&#160;•&#160;%2$d Episodes</string>
+    <string name="key_season_finale">Season Finale</string>
+    <string name="key_season_desc">%1$s of %2$s premiered on %3$s.</string>
 </resources>

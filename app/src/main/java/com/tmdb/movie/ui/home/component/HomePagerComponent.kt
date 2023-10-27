@@ -1,7 +1,13 @@
 package com.tmdb.movie.ui.home.component
 
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -15,6 +21,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,6 +29,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -43,8 +51,8 @@ import com.google.accompanist.placeholder.shimmer
 import com.tmdb.movie.R
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
-import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MediaItem
+import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.ui.home.vm.MovieLoadState
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
 import kotlinx.coroutines.CoroutineScope
@@ -118,10 +126,7 @@ fun HomePagerComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    val pageOffset = (
-                            (pagerState.currentPage - page) + pagerState
-                                .currentPageOffsetFraction
-                            ).absoluteValue
+                    val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
                     scaleX = lerp(
                         start = 0.85f,
                         stop = 1f,
@@ -132,18 +137,30 @@ fun HomePagerComponent(
                         stop = 1f,
                         fraction = 1f - pageOffset.coerceIn(0f, 1f)
                     )
+                    /*alpha = lerp(
+                        start = 0.5f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    )*/
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val blur = (pageOffset * 10f).coerceAtLeast(0.1f)
+                        renderEffect = RenderEffect
+                            .createBlurEffect(blur, blur, Shader.TileMode.DECAL)
+                            .asComposeRenderEffect()
+                    }
                 },
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {
                         if (pagerState.currentPage == page) {
                             navigateToMovieDetail(movieItem.id, MediaType.MOVIE)
                         } else {
                             coroutineScope.launch {
-                                pagerState.animateScrollToPage(page)
+                                pagerState.animateScrollToPage(page,
+                                    animationSpec = tween(500)
+                                )
                             }
                         }
                     },
@@ -155,7 +172,7 @@ fun HomePagerComponent(
                 contentScale = ContentScale.FillWidth,
                 contentDescription = ""
             )
-            BasicText(
+            Text(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .graphicsLayer {
@@ -167,13 +184,12 @@ fun HomePagerComponent(
                         )
                     }
                     .padding(top = 8.dp),
-                text = movieItem.getMovieName(MediaType.MOVIE) ?: "",
+                text = movieItem.getMovieName(MediaType.MOVIE),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                 ),
                 maxLines = 1,
-
                 overflow = TextOverflow.Ellipsis,
             )
         }

@@ -160,10 +160,10 @@ interface ApiService {
     suspend fun getListsDetail(@Path("list_id") listId: Int, @Query("language") language: String = getLanguage()): ListsDetail
 
     @GET("account/{account_id}/favorite/movies")
-    suspend fun getFavoriteMovies(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+    suspend fun getFavoriteMovies(@Path("account_id") accountId: Int, @Query("page") page: Int, @Query("sort_by") sortBy: String = "created_at.desc"): BaseListData<MediaItem>
 
     @GET("account/{account_id}/favorite/tv")
-    suspend fun getFavoriteTV(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+    suspend fun getFavoriteTV(@Path("account_id") accountId: Int, @Query("page") page: Int, @Query("sort_by") sortBy: String = "created_at.desc"): BaseListData<MediaItem>
 
     @GET("account/{account_id}/watchlist/movies")
     suspend fun getWatchlistMovies(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>

@@ -84,9 +84,9 @@ fun DiscoveryMoviePage(
         movieList?.refresh()
     })
 
-    LaunchedEffect(refreshState.progress) {
-        onPullRefreshProgress(refreshState.progress)
-    }
+//    LaunchedEffect(refreshState.progress) {
+//        onPullRefreshProgress(refreshState.progress)
+//    }
 
     LaunchedEffect(movieList?.loadState) {
         isRefreshing = movieList?.loadState?.refresh is LoadState.Loading

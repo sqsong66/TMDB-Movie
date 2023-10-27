@@ -16,9 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,8 +47,8 @@ fun DiscoveryScreen(toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> }
 
     // 顶部搜索区域偏移量
     val toolbarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
-    var pullRefreshProgress by remember { mutableFloatStateOf(0f) }
 
+    /*var pullRefreshProgress by remember { mutableFloatStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -61,7 +58,7 @@ fun DiscoveryScreen(toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> }
                 return Offset.Zero
             }
         }
-    }
+    }*/
 
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -80,9 +77,7 @@ fun DiscoveryScreen(toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> }
             DiscoveryMovieRoute(
                 topHeight = toolbarHeight.pxToDp(),
                 mediaType = pageIndex,
-                onPullRefreshProgress = { progress ->
-                    pullRefreshProgress = progress
-                },
+                onPullRefreshProgress = { },
                 toDetail = toDetail,
             )
         }
