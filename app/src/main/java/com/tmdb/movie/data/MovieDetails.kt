@@ -1,10 +1,12 @@
 package com.tmdb.movie.data
 
 import android.content.Context
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.tmdb.movie.R
 import com.tmdb.movie.ext.formatWithCommasAndDecimals
 import com.tmdb.movie.utils.niceDate
+import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
 
 data class MovieDetails(
@@ -244,6 +246,7 @@ data class Network(
     val originCountry: String? = null
 )
 
+@Parcelize
 data class Season(
     @SerializedName("air_date")
     val airDate: String? = null,
@@ -261,7 +264,7 @@ data class Season(
     val seasonNumber: Int = 0,
     @SerializedName("vote_average")
     val voteAverage: Float = 0.0f
-) {
+) : Parcelable {
 
     fun getSeasonOverview(context: Context): String {
         return if (overview.isNullOrEmpty()) {
@@ -273,6 +276,10 @@ data class Season(
 
     fun niceAirDate(): String {
         return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: ""
+    }
+
+    override fun toString(): String {
+        return "Season(airDate=$airDate, episodeCount=$episodeCount, id=$id, name=$name, overview=$overview, posterPath=$posterPath, seasonNumber=$seasonNumber, voteAverage=$voteAverage)"
     }
 
 }

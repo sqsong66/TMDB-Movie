@@ -7,6 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.tmdb.movie.data.MediaType
+import com.tmdb.movie.data.Season
+import com.tmdb.movie.data.SeasonInfo
 
 internal const val movieIdArg = "movieId"
 internal const val movieTypeArg = "movieType"
@@ -33,8 +35,9 @@ fun NavGraphBuilder.movieDetailScreen(
     onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
-    toSeasonDetail: (String, Int, Int) -> Unit,
+    toSeasonDetail: (String, Int, List<Season>) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toSeasonList: (SeasonInfo) -> Unit,
 ) {
     composable(
         route = "$movieDetailNavigationRoute/{$movieIdArg}/{$movieTypeArg}/{$movieFromArg}",
@@ -63,6 +66,7 @@ fun NavGraphBuilder.movieDetailScreen(
             onNavigateToPeopleDetail = onNavigateToPeopleDetail,
             toSeasonDetail = toSeasonDetail,
             toEpisodeDetail = toEpisodeDetail,
+            toSeasonList = toSeasonList
         )
     }
 }

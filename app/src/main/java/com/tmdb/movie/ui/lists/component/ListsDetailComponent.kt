@@ -167,9 +167,9 @@ fun ListsDetailTitle(
     headerHeight: Dp,
     topBarHeight: Dp,
 ) {
+    val scrollValue by rememberCurrentOffset(gridState)
     var titleHeightPx by remember { mutableFloatStateOf(0f) }
     var titleWidthPx by remember { mutableFloatStateOf(0f) }
-    val scrollValue by rememberCurrentOffset(gridState)
     val statusBarHeight = LocalFixedInsets.current.statusBarHeight
 
     Text(

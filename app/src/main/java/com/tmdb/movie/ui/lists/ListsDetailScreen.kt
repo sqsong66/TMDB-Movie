@@ -94,7 +94,6 @@ fun ListsDetailContent(
 ) {
 
     val lazyGridState = rememberLazyGridState()
-    // val scrollValue = rememberCurrentOffset(listState)
     var headerHeight by remember { mutableFloatStateOf(620f) }
     var topBarHeight by remember { mutableFloatStateOf(0f) }
 

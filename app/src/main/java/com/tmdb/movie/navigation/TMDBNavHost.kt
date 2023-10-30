@@ -33,6 +33,8 @@ import com.tmdb.movie.ui.media.createListScreen
 import com.tmdb.movie.ui.media.navigateToCreateList
 import com.tmdb.movie.ui.people.navigateToPeopleDetail
 import com.tmdb.movie.ui.people.peopleDetailScreen
+import com.tmdb.movie.ui.tv.navigateToTVSeasonList
+import com.tmdb.movie.ui.tv.tvSeasonListScreen
 
 @Composable
 fun TMDBNavHost(
@@ -113,11 +115,14 @@ fun TMDBNavHost(
                     onCreateList = {
                         navController.navigateToCreateList()
                     },
-                    toSeasonDetail = { backdropPath, tvId, seasonNum ->
-
+                    toSeasonDetail = { backdropPath, tvId, seasons ->
+                        // navController.navigateToTVSeasonDetail(tvId, backdropPath, seasons)
                     },
                     toEpisodeDetail = { backdropPath, tvId, seasonNum, episodeNum ->
 
+                    },
+                    toSeasonList = { seasonInfo ->
+                        navController.navigateToTVSeasonList(seasonInfo)
                     }
                 )
             })
@@ -154,6 +159,12 @@ fun TMDBNavHost(
             onBackClick = onBackClick,
             toMediaDetail = { id, type ->
                 navController.navigateToMovieDetail(id, type, from = 1)
+            }
+        )
+        tvSeasonListScreen(
+            onBackClick = onBackClick,
+            toTVEpisodeDetail = { tvId, tvBackdropPath, tvSeasonNum, tvEpisodeNum ->
+
             }
         )
     }

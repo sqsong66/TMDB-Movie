@@ -56,6 +56,8 @@ import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MovieImage
+import com.tmdb.movie.data.Season
+import com.tmdb.movie.data.SeasonInfo
 import com.tmdb.movie.data.Video
 import com.tmdb.movie.ui.detail.component.LatestSeasonComponent
 import com.tmdb.movie.ui.detail.component.MovieBackdropLayout
@@ -94,9 +96,10 @@ fun MovieDetailRoute(
     onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
-    toSeasonDetail: (String, Int, Int) -> Unit,
-    viewModel: MovieDetailViewModel = hiltViewModel(),
+    toSeasonDetail: (String, Int, List<Season>) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toSeasonList: (SeasonInfo) -> Unit,
+    viewModel: MovieDetailViewModel = hiltViewModel(),
 ) {
 
     BackHandler { onBackClick(movieFrom == 0) }
@@ -271,7 +274,8 @@ fun MovieDetailRoute(
             previewImageUrl = it
         },
         toSeasonDetail = toSeasonDetail,
-        toEpisodeDetail = toEpisodeDetail
+        toEpisodeDetail = toEpisodeDetail,
+        toSeasonList = toSeasonList
     )
 
     if (previewImageUrl != null) {
@@ -303,8 +307,9 @@ fun MovieDetailScreen(
     onWatchlist: () -> Unit,
     onAddList: () -> Unit,
     onShare: () -> Unit,
-    toSeasonDetail: (String, Int, Int) -> Unit,
+    toSeasonDetail: (String, Int, List<Season>) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toSeasonList: (SeasonInfo) -> Unit,
 ) {
     val title = if (movieDetailUiState is MovieDetailUiState.Success) {
         movieDetailUiState.movieDetails.getMovieName(mediaType) ?: ""
@@ -350,6 +355,7 @@ fun MovieDetailScreen(
                         onPreviewImage = onPreviewImage,
                         toSeasonDetail = toSeasonDetail,
                         toEpisodeDetail = toEpisodeDetail,
+                        toSeasonList = toSeasonList,
                     )
                 }
 
@@ -462,7 +468,8 @@ fun MovieDetailComponent(
     onMoreVideos: (List<Video>) -> Unit,
     onMoreImages: (@ImageType Int, List<MovieImage>) -> Unit,
     onPeopleDetail: (Int) -> Unit,
-    toSeasonDetail: (String, Int, Int) -> Unit,
+    toSeasonDetail: (String, Int, List<Season>) -> Unit,
+    toSeasonList: (SeasonInfo) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
 ) {
     Column(
@@ -510,10 +517,21 @@ fun MovieDetailComponent(
                 episodeToAir = movieDetails.nextEpisodeToAir ?: movieDetails.lastEpisodeToAir,
                 onBuildImage = onBuildImage,
                 toSeasonDetail = { seasonNum ->
-                    toSeasonDetail(movieDetails.backdropPath ?: "", movieDetails.id, seasonNum)
+                    toSeasonDetail(movieDetails.backdropPath ?: "", movieDetails.id, movieDetails.seasons)
                 },
                 toEpisodeDetail = { seasonNum, episodeNum ->
                     toEpisodeDetail(movieDetails.backdropPath ?: "", movieDetails.id, seasonNum, episodeNum)
+                },
+                toSeasonList = {
+                    val seasonInfo = SeasonInfo(
+                        tvId = movieDetails.id,
+                        tvName = movieDetails.name ?: "",
+                        airDate = movieDetails.firstAirDate ?: "",
+                        backdropPath = movieDetails.backdropPath ?: "",
+                        posterPath = movieDetails.posterPath ?: "",
+                        seasons = movieDetails.seasons,
+                    )
+                    toSeasonList(seasonInfo)
                 }
             )
         }
@@ -613,6 +631,7 @@ fun MovieDetailScreenPreview() {
             onPreviewImage = {},
             toSeasonDetail = { _, _, _ -> },
             toEpisodeDetail = { _, _, _, _ -> },
+            toSeasonList = { _ -> },
         )
     }
 }

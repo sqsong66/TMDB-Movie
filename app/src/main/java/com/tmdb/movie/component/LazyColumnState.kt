@@ -1,5 +1,6 @@
 package com.tmdb.movie.component
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +30,28 @@ fun rememberCurrentOffset(state: LazyGridState): State<Int> {
             currentOffset.intValue += itemOffset.value
         }
     }
+    return currentOffset
+}
 
+@Composable
+fun rememberCurrentOffset(state: LazyListState): State<Int> {
+    val position = remember { derivedStateOf { state.firstVisibleItemIndex } }
+    val itemOffset = remember { derivedStateOf { state.firstVisibleItemScrollOffset } }
+    val lastPosition = rememberPrevious(position.value)
+    val lastItemOffset = rememberPrevious(itemOffset.value)
+    val currentOffset = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(position.value, itemOffset.value) {
+        if (lastPosition == null || position.value == 0) {
+            currentOffset.intValue = itemOffset.value
+        } else if (lastPosition == position.value) {
+            currentOffset.intValue += (itemOffset.value - (lastItemOffset ?: 0))
+        } else if (lastPosition > position.value) {
+            currentOffset.intValue -= (lastItemOffset ?: 0)
+        } else { // lastPosition.value < position.value
+            currentOffset.intValue += itemOffset.value
+        }
+    }
     return currentOffset
 }
 

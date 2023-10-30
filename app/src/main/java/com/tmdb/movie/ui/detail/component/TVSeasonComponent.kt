@@ -41,7 +41,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,13 +73,8 @@ fun LatestSeasonComponent(
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
     toSeasonDetail: (Int) -> Unit,
     toEpisodeDetail: (Int, Int) -> Unit,
+    toSeasonList: () -> Unit,
 ) {
-
-    val context = LocalContext.current
-    var isImageError by rememberSaveable { mutableStateOf(false) }
-    val placeholderBitmap = AppCompatResources.getDrawable(context, R.drawable.image_placeholder)?.toBitmap()?.apply {
-        eraseColor(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f).toArgb())
-    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -90,212 +84,237 @@ fun LatestSeasonComponent(
             title = stringResource(if (episodeToAir?.isLastEpisode() == true) R.string.key_view_last_season else R.string.key_view_current_season),
             showMoreText = true,
             moreText = stringResource(id = R.string.key_view_all_seasons),
-            onMoreTextClick = { }
+            onMoreTextClick = { toSeasonList() },
         )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .padding(top = 12.dp, start = 16.dp, end = 16.dp)
-                .shadow(elevation = 4.dp, shape = MaterialTheme.shapes.small)
-                .clickable {
-                    toSeasonDetail(lastSeason.seasonNumber)
-                },
-            shape = MaterialTheme.shapes.small,
+        TVSeasonCard(
+            tvName = tvName,
+            episodeToAir = episodeToAir,
+            lastSeason = lastSeason,
+            toSeasonDetail = toSeasonDetail,
+            toEpisodeDetail = toEpisodeDetail,
+            onBuildImage = onBuildImage,
+        )
+    }
+}
+
+@Composable
+fun TVSeasonCard(
+    modifier: Modifier = Modifier,
+    tvName: String,
+    episodeToAir: EpisodeToAir?,
+    lastSeason: Season,
+    onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
+    toSeasonDetail: (Int) -> Unit,
+    toEpisodeDetail: (Int, Int) -> Unit,
+) {
+    val context = LocalContext.current
+    var isImageError by rememberSaveable { mutableStateOf(false) }
+    val placeholderBitmap = AppCompatResources.getDrawable(context, R.drawable.image_placeholder)?.toBitmap()?.apply {
+        eraseColor(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f).toArgb())
+    }
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(160.dp)
+            .padding(top = 12.dp, start = 16.dp, end = 16.dp)
+            .shadow(elevation = 4.dp, shape = MaterialTheme.shapes.small)
+            .clickable {
+                toSeasonDetail(lastSeason.seasonNumber)
+            },
+        shape = MaterialTheme.shapes.small,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    AsyncImage(
-                        modifier = Modifier.fillMaxHeight(),
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
-                            .error(BitmapDrawable(context.resources, placeholderBitmap))
-                            .data(onBuildImage(lastSeason.posterPath, ImageType.POSTER, ImageSize.MEDIUM))
-                            .crossfade(true)
-                            .listener(onError = { _, _ ->
-                                isImageError = true
-                            })
-                            .build(),
-                        contentScale = ContentScale.FillHeight,
+                AsyncImage(
+                    modifier = Modifier.fillMaxHeight(),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .placeholder(BitmapDrawable(context.resources, placeholderBitmap))
+                        .error(BitmapDrawable(context.resources, placeholderBitmap))
+                        .data(onBuildImage(lastSeason.posterPath, ImageType.POSTER, ImageSize.MEDIUM))
+                        .crossfade(true)
+                        .listener(onError = { _, _ ->
+                            isImageError = true
+                        })
+                        .build(),
+                    contentScale = ContentScale.FillHeight,
+                    contentDescription = null,
+                )
+                if (isImageError) {
+                    Image(
+                        modifier = Modifier
+                            .size(45.dp)
+                            .align(Alignment.Center),
+                        painter = painterResource(id = R.drawable.baseline_imagesmode_24),
                         contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
                     )
-                    if (isImageError) {
-                        Image(
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, start = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = lastSeason.name ?: "",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onBackground,
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    if (episodeToAir?.isLastEpisode() == true) {
+                        Text(
                             modifier = Modifier
-                                .size(45.dp)
-                                .align(Alignment.Center),
-                            painter = painterResource(id = R.drawable.baseline_imagesmode_24),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                                .padding(start = 4.dp, end = 16.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .padding(horizontal = 6.dp, vertical = 3.dp),
+                            text = stringResource(id = R.string.key_season_finale),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            ),
                         )
                     }
                 }
-                Column(
+
+                Row(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(top = 6.dp, start = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, start = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = lastSeason.name ?: "",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                color = MaterialTheme.colorScheme.onBackground,
+                    if (lastSeason.voteAverage != 0f) {
+                        RatingBar(
+                            modifier = Modifier,
+                            value = lastSeason.voteAverage / 10,
+                            style = RatingBarStyle.Fill(
+                                activeColor = MaterialTheme.colorScheme.primary,
+                                inActiveColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                             ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                            size = 14.dp,
+                            numOfStars = 1,
+                            spaceBetween = 1.dp,
+                            onValueChange = {},
+                            onRatingChanged = {},
                         )
-
-                        if (episodeToAir?.isLastEpisode() == true) {
-                            Text(
-                                modifier = Modifier
-                                    .padding(start = 4.dp, end = 16.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(horizontal = 6.dp, vertical = 3.dp),
-                                text = stringResource(id = R.string.key_season_finale),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Normal,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                ),
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 6.dp, start = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (lastSeason.voteAverage != 0f) {
-                            RatingBar(
-                                modifier = Modifier,
-                                value = lastSeason.voteAverage / 10,
-                                style = RatingBarStyle.Fill(
-                                    activeColor = MaterialTheme.colorScheme.primary,
-                                    inActiveColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                                ),
-                                size = 14.dp,
-                                numOfStars = 1,
-                                spaceBetween = 1.dp,
-                                onValueChange = {},
-                                onRatingChanged = {},
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .padding(start = 3.dp, end = 10.dp),
-                                text = buildAnnotatedString {
-                                    withStyle(
-                                        style = SpanStyle(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp,
-                                        )
-                                    ) {
-                                        append(String.format("%.1f", lastSeason.voteAverage))
-                                    }
-                                },
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                ),
-                            )
-                        }
-
                         Text(
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 16.dp),
-                            text = String.format(
-                                stringResource(R.string.key_year_episodes),
-                                lastSeason.airDate?.substring(0, 4),
-                                lastSeason.episodeCount
-                            ),
+                                .padding(start = 3.dp, end = 10.dp),
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                    )
+                                ) {
+                                    append(String.format("%.1f", lastSeason.voteAverage))
+                                }
+                            },
                             style = MaterialTheme.typography.labelMedium.copy(
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                                fontWeight = FontWeight.Bold
+                                color = MaterialTheme.colorScheme.onBackground,
                             ),
-                            textAlign = TextAlign.Start
                         )
                     }
 
                     Text(
-                        text = if (!lastSeason.overview.isNullOrEmpty()) {
-                            lastSeason.getSeasonOverview(context = LocalContext.current)
-                        } else {
-                            String.format(context.getString(R.string.key_season_desc), lastSeason.name, tvName, lastSeason.niceAirDate())
-                        },
                         modifier = Modifier
-                            .padding(start = 16.dp, top = 8.dp, end = 16.dp)
-                            .weight(1f),
+                            .weight(1f)
+                            .padding(end = 16.dp),
+                        text = String.format(
+                            stringResource(R.string.key_year_episodes),
+                            lastSeason.airDate?.substring(0, 4),
+                            lastSeason.episodeCount
+                        ),
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                            fontWeight = FontWeight.Bold
+                        ),
+                        textAlign = TextAlign.Start
+                    )
+                }
+
+                Text(
+                    text = if (!lastSeason.overview.isNullOrEmpty()) {
+                        lastSeason.getSeasonOverview(context = LocalContext.current)
+                    } else {
+                        String.format(context.getString(R.string.key_season_desc), lastSeason.name, tvName, lastSeason.niceAirDate())
+                    },
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
+                        .weight(1f),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                    ),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, start = 16.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(14.dp),
+                        painter = painterResource(id = R.drawable.baseline_calendar_month_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                    )
+                    val lineColor = MaterialTheme.colorScheme.primary
+                    Text(
+                        modifier = Modifier
+                            .weight(1f, false)
+                            .padding(start = 4.dp, end = 4.dp, top = 6.dp, bottom = 6.dp)
+                            .drawBehind {
+                                val strokeWidth = 1.dp.toPx()
+                                drawLine(
+                                    color = lineColor,
+                                    start = Offset(x = 0f, y = size.height + strokeWidth),
+                                    end = Offset(x = size.width, y = size.height + strokeWidth),
+                                    strokeWidth = strokeWidth
+                                )
+                            }
+                            .clip(RoundedCornerShape(4.dp))
+                            .clickable {
+                                toEpisodeDetail(lastSeason.seasonNumber, episodeToAir?.episodeNumber ?: 0)
+                            },
+                        text = episodeToAir?.name ?: "",
+                        style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                         ),
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    Row(
+                    Text(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp, start = 16.dp, bottom = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(14.dp),
-                            painter = painterResource(id = R.drawable.baseline_calendar_month_24),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                        )
-                        val lineColor = MaterialTheme.colorScheme.primary
-                        Text(
-                            modifier = Modifier
-                                .weight(1f, false)
-                                .padding(start = 4.dp, end = 4.dp, top = 6.dp, bottom = 6.dp)
-                                .drawBehind {
-                                    val strokeWidth = 1.dp.toPx()
-                                    drawLine(
-                                        color = lineColor,
-                                        start = Offset(x = 0f, y = size.height + strokeWidth),
-                                        end = Offset(x = size.width, y = size.height + strokeWidth),
-                                        strokeWidth = strokeWidth
-                                    )
-                                }
-                                .clip(RoundedCornerShape(4.dp))
-                                .clickable {
-                                    toEpisodeDetail(lastSeason.seasonNumber, episodeToAir?.episodeNumber ?: 0)
-                                },
-                            text = episodeToAir?.name ?: "",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            modifier = Modifier
-                                .padding(start = 4.dp, top = 4.dp, bottom = 4.dp, end = 16.dp),
-                            text = buildAnnotatedString {
-                                append("(${episodeToAir?.seasonNumber}x${episodeToAir?.episodeNumber},  ")
-                                append("${episodeToAir?.niceAirDate()})")
-                            },
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                            ),
-                        )
-                    }
+                            .padding(start = 4.dp, top = 4.dp, bottom = 4.dp, end = 16.dp),
+                        text = buildAnnotatedString {
+                            append("(${episodeToAir?.seasonNumber}x${episodeToAir?.episodeNumber},  ")
+                            append("${episodeToAir?.niceAirDate()})")
+                        },
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                        ),
+                    )
                 }
             }
         }
@@ -327,7 +346,8 @@ fun LatestSeasonComponentPreview() {
                 airDate = "2019-04-14"
             ),
             toSeasonDetail = { },
-            toEpisodeDetail = { _, _ -> }
+            toEpisodeDetail = { _, _ -> },
+            toSeasonList = { },
         )
     }
 }
