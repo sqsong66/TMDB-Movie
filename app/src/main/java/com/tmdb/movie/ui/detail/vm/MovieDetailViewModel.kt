@@ -62,6 +62,13 @@ class MovieDetailViewModel @Inject constructor(
         initialValue = AddListUiState.Idle,
     )
 
+    private var _mediaListUiState = MutableStateFlow<MediaListUiState>(MediaListUiState.Idle)
+    val mediaListUiState: StateFlow<MediaListUiState> = _mediaListUiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = MediaListUiState.Idle,
+    )
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val accountStateTrigger = triggerAccountStateChannel.receiveAsFlow()
         .filter { it.isNotEmpty() }
@@ -144,9 +151,10 @@ class MovieDetailViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val mediaListUiState: StateFlow<MediaListUiState> = triggerMediaListChannel.receiveAsFlow()
+    val mediaListUiStateTrigger: StateFlow<MediaListUiState> = triggerMediaListChannel.receiveAsFlow()
         .flatMapLatest { repository.getAccountMediaLists(it) }
         .map {
+            Log.d("sqsong", "getAccountMediaLists mediaListUiState: $it")
             when (it) {
                 is Result.Success -> {
                     MediaListUiState.Success(it.data)
@@ -156,6 +164,9 @@ class MovieDetailViewModel @Inject constructor(
 
                 Result.Loading -> MediaListUiState.Idle
             }
+        }
+        .onEach {
+            _mediaListUiState.value = it
         }
         .stateIn(
             scope = viewModelScope,
@@ -215,6 +226,8 @@ class MovieDetailViewModel @Inject constructor(
         watchlistStateTrigger.launchIn(viewModelScope)
         // 订阅 添加列表 状态
         addListTrigger.launchIn(viewModelScope)
+        // 列表 状态
+        mediaListUiStateTrigger.launchIn(viewModelScope)
     }
 
     val configStream: StateFlow<TMDBConfig> = repository.configStream
@@ -321,6 +334,10 @@ class MovieDetailViewModel @Inject constructor(
 
     fun resetAddListState() {
         _addListState.value = AddListUiState.Idle
+    }
+
+    fun resetMediaListState() {
+        _mediaListUiState.value = MediaListUiState.Idle
     }
 }
 

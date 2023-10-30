@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.Season
+import com.tmdb.movie.data.SeasonDetailParam
 import com.tmdb.movie.data.SeasonInfo
 
 internal const val movieIdArg = "movieId"
@@ -35,7 +36,7 @@ fun NavGraphBuilder.movieDetailScreen(
     onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
-    toSeasonDetail: (String, Int, List<Season>) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
 ) {

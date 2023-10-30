@@ -17,6 +17,7 @@ import com.tmdb.movie.data.RequestToken
 import com.tmdb.movie.data.RequestTokenInfo
 import com.tmdb.movie.data.ResponseResult
 import com.tmdb.movie.data.SearchItem
+import com.tmdb.movie.data.Season
 import com.tmdb.movie.data.Session
 import com.tmdb.movie.data.SessionData
 import com.tmdb.movie.data.TMDBConfiguration
@@ -82,7 +83,7 @@ interface ApiService {
     @GET("movie/{id}/images")
     suspend fun getMovieImages(
         @Path("id") id: Int,
-       // @Query("language") language: String = getLanguage(),
+        // @Query("language") language: String = getLanguage(),
     ): ImagesData
 
     @GET("tv/{id}/images")
@@ -160,10 +161,18 @@ interface ApiService {
     suspend fun getListsDetail(@Path("list_id") listId: Int, @Query("language") language: String = getLanguage()): ListsDetail
 
     @GET("account/{account_id}/favorite/movies")
-    suspend fun getFavoriteMovies(@Path("account_id") accountId: Int, @Query("page") page: Int, @Query("sort_by") sortBy: String = "created_at.desc"): BaseListData<MediaItem>
+    suspend fun getFavoriteMovies(
+        @Path("account_id") accountId: Int,
+        @Query("page") page: Int,
+        @Query("sort_by") sortBy: String = "created_at.desc"
+    ): BaseListData<MediaItem>
 
     @GET("account/{account_id}/favorite/tv")
-    suspend fun getFavoriteTV(@Path("account_id") accountId: Int, @Query("page") page: Int, @Query("sort_by") sortBy: String = "created_at.desc"): BaseListData<MediaItem>
+    suspend fun getFavoriteTV(
+        @Path("account_id") accountId: Int,
+        @Query("page") page: Int,
+        @Query("sort_by") sortBy: String = "created_at.desc"
+    ): BaseListData<MediaItem>
 
     @GET("account/{account_id}/watchlist/movies")
     suspend fun getWatchlistMovies(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
@@ -176,4 +185,7 @@ interface ApiService {
 
     @GET("account/{account_id}/rated/tv")
     suspend fun getRatedTV(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
+
+    @GET("tv/{serial_id}/season/{season_number}")
+    suspend fun getSeasonDetails(@Path("serial_id") serialId: Int, @Path("season_number") seasonNumber: Int): Season
 }

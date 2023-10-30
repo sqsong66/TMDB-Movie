@@ -122,7 +122,7 @@ fun HomeRoute(
         },
         isRefreshing = moviesTrendingState is MovieLoadState.Loading,
         onBuildImage = { url, type, size ->
-            config.buildImageUrl(type, url, size)
+            config.buildImageUrl(url, type, size)
         },
         navigateToMovieDetail = { id, type ->
             navigateToMovieDetail(id, type, 0)

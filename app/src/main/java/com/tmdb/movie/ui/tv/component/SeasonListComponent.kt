@@ -134,7 +134,7 @@ fun SeasonListTopBarPreview() {
 fun SeasonListItem(
     modifier: Modifier = Modifier,
     tvName: String,
-    lastSeason: Season,
+    season: Season,
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
     toSeasonDetail: (Int) -> Unit,
 ) {
@@ -149,7 +149,7 @@ fun SeasonListItem(
             .height(160.dp)
             .shadow(elevation = 4.dp, shape = MaterialTheme.shapes.small)
             .clickable {
-                toSeasonDetail(lastSeason.seasonNumber)
+                toSeasonDetail(season.seasonNumber)
             },
         shape = MaterialTheme.shapes.small,
     ) {
@@ -163,7 +163,7 @@ fun SeasonListItem(
                     modifier = Modifier.fillMaxHeight(),
                     model = ImageRequest.Builder(LocalContext.current).placeholder(BitmapDrawable(context.resources, placeholderBitmap))
                         .error(BitmapDrawable(context.resources, placeholderBitmap))
-                        .data(onBuildImage(lastSeason.posterPath, ImageType.POSTER, ImageSize.MEDIUM)).crossfade(true).listener(onError = { _, _ ->
+                        .data(onBuildImage(season.posterPath, ImageType.POSTER, ImageSize.MEDIUM)).crossfade(true).listener(onError = { _, _ ->
                             isImageError = true
                         }).build(),
                     contentScale = ContentScale.FillHeight,
@@ -192,7 +192,7 @@ fun SeasonListItem(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = lastSeason.name ?: "",
+                        text = season.name ?: "",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = MaterialTheme.colorScheme.onBackground,
                         ),
@@ -206,10 +206,10 @@ fun SeasonListItem(
                         .fillMaxWidth()
                         .padding(top = 6.dp, start = 16.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (lastSeason.voteAverage != 0f) {
+                    if (season.voteAverage != 0f) {
                         RatingBar(
                             modifier = Modifier,
-                            value = lastSeason.voteAverage / 10,
+                            value = season.voteAverage / 10,
                             style = RatingBarStyle.Fill(
                                 activeColor = MaterialTheme.colorScheme.primary,
                                 inActiveColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
@@ -230,7 +230,7 @@ fun SeasonListItem(
                                         fontSize = 12.sp,
                                     )
                                 ) {
-                                    append(String.format("%.1f", lastSeason.voteAverage))
+                                    append(String.format("%.1f", season.voteAverage))
                                 }
                             },
                             style = MaterialTheme.typography.labelMedium.copy(
@@ -243,7 +243,7 @@ fun SeasonListItem(
                         modifier = Modifier
                             .weight(1f)
                             .padding(end = 16.dp), text = String.format(
-                            stringResource(R.string.key_year_episodes), lastSeason.airDate?.substring(0, 4), lastSeason.episodeCount
+                            stringResource(R.string.key_year_episodes), season.getTVAirYear(), season.episodeCount
                         ), style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f), fontWeight = FontWeight.Bold
                         ), textAlign = TextAlign.Start
@@ -251,10 +251,10 @@ fun SeasonListItem(
                 }
 
                 Text(
-                    text = if (!lastSeason.overview.isNullOrEmpty()) {
-                        lastSeason.getSeasonOverview(context = LocalContext.current)
+                    text = if (!season.overview.isNullOrEmpty()) {
+                        season.getSeasonOverview(context = LocalContext.current)
                     } else {
-                        String.format(context.getString(R.string.key_season_desc), lastSeason.name, tvName, lastSeason.niceAirDate())
+                        String.format(context.getString(R.string.key_season_desc), season.name, tvName, season.niceAirDate())
                     },
                     modifier = Modifier
                         .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
@@ -277,7 +277,7 @@ fun SeasonListItemPreview() {
     TMDBMovieTheme {
         SeasonListItem(
             tvName = "The Flash",
-            lastSeason = Season(
+            season = Season(
                 airDate = "2021-07-20",
                 episodeCount = 18,
                 id = 60735,
@@ -376,6 +376,7 @@ fun SeasonListBody(
     listState: LazyListState,
     headerHeight: Float,
     seasons: List<Season>?,
+    toSeasonDetail: (Int) -> Unit,
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
 ) {
 
@@ -385,7 +386,7 @@ fun SeasonListBody(
     ) {
         item { Spacer(modifier = Modifier.height(headerHeight.pxToDp())) }
         items(seasons?.size ?: 0) { index ->
-            seasons?.get(index)?.let {
+            seasons?.get(index)?.let { season ->
                 SeasonListItem(
                     modifier = Modifier.padding(
                         top = 16.dp,
@@ -394,8 +395,8 @@ fun SeasonListBody(
                         bottom = if (index == seasons.size - 1) 16.dp else 0.dp
                     ),
                     tvName = tvName,
-                    lastSeason = it,
-                    toSeasonDetail = {},
+                    season = season,
+                    toSeasonDetail = { toSeasonDetail(season.seasonNumber) },
                     onBuildImage = onBuildImage,
                 )
             }
@@ -411,6 +412,7 @@ fun SeasonListBodyPreview() {
             modifier = Modifier, tvName = "The Flash",
             listState = LazyListState(),
             headerHeight = 200f,
+            toSeasonDetail = {},
             seasons = listOf(
                 Season(
                     airDate = "2021-07-20",

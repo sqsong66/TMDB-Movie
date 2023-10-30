@@ -20,6 +20,7 @@ import com.tmdb.movie.data.RequestToken
 import com.tmdb.movie.data.RequestTokenInfo
 import com.tmdb.movie.data.ResponseResult
 import com.tmdb.movie.data.Result
+import com.tmdb.movie.data.Season
 import com.tmdb.movie.data.Session
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.TMDBConfiguration
@@ -297,4 +298,9 @@ class TMDBMovieRepository @Inject constructor(
     override fun getAccountMediaListsPagingSource(accountId: Int, mediaType: Int, accountMediaType: Int): AccountMediaListsPagingSource {
         return AccountMediaListsPagingSource(apiService, accountId, mediaType, accountMediaType)
     }
+
+    override fun getSeasonDetail(tvId: Int, seasonNumber: Int): Flow<Result<Season>> = flow {
+        emit(apiService.getSeasonDetails(tvId, seasonNumber))
+    }.asResult()
+
 }

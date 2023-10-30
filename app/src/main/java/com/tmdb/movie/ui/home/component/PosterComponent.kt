@@ -37,6 +37,8 @@ import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.shimmerHighlightColor
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarStyle
 import com.tmdb.movie.R
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.MediaItem
@@ -163,19 +165,25 @@ fun PosterComponent(
                     text = String.format("%.1f", movieItem?.voteAverage),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
                 )
-                Icon(
-                    modifier = Modifier
-                        .padding(start = 2.dp)
-                        .size(14.dp),
-                    painter = painterResource(id = R.drawable.baselin_start_24),
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.primary
+                RatingBar(
+                    modifier = Modifier.padding(start = 4.dp),
+                    value = (movieItem?.voteAverage ?: 0f) / (if (mediaType == MediaType.MOVIE) 10 else 2),
+                    style = RatingBarStyle.Fill(
+                        activeColor = MaterialTheme.colorScheme.primary,
+                        inActiveColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    ),
+                    size = 12.dp,
+                    numOfStars = if (mediaType == MediaType.MOVIE) 1 else 5,
+                    spaceBetween = 1.dp,
+                    onValueChange = {},
+                    onRatingChanged = {},
                 )
             }
             Text(
                 modifier = Modifier
                     .padding(start = 4.dp),
-                text = movieItem?.getNiceDate(mediaType = mediaType, isFormatShort = mediaType == MediaType.MOVIE) ?: stringResource(id = R.string.key_unknown),
+                text = movieItem?.getNiceDate(mediaType = mediaType, isFormatShort = mediaType == MediaType.MOVIE)
+                    ?: stringResource(id = R.string.key_unknown),
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
             )
         }
@@ -261,11 +269,44 @@ fun PosterComponentPlaceholder(
 }
 
 @Preview(showBackground = true)
-//@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+//@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PosterComponentPreview() {
     TMDBMovieTheme {
-        PosterComponent(movieItem = null)
+        PosterComponent(
+            movieItem = MediaItem(
+                id = 1,
+                title = "Blue Beetle",
+                posterPath = "/blue_beetle.jpg",
+                backdropPath = "/blue_beetle_backdrop.jpg",
+                voteAverage = 8.5f,
+                releaseDate = "2023-09-23",
+                firstAirDate = "2023-09-23",
+                mediaType = "movie"
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+//@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun PosterTVComponentPreview() {
+    TMDBMovieTheme {
+        PosterComponent(
+            movieItem = MediaItem(
+                id = 1,
+                title = "Blue Beetle",
+                name = "Blue Beetle",
+                posterPath = "/blue_beetle.jpg",
+                backdropPath = "/blue_beetle_backdrop.jpg",
+                voteAverage = 8.5f,
+                releaseDate = "2023-09-23",
+                firstAirDate = "2023-09-23",
+                mediaType = "tv"
+            ),
+            mediaType = MediaType.TV
+        )
     }
 }
 

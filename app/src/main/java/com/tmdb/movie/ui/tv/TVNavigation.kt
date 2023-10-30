@@ -9,23 +9,18 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.google.gson.Gson
+import com.tmdb.movie.data.SeasonDetailParam
 import com.tmdb.movie.data.SeasonInfo
-
-
-internal const val tvBackdropPathArg = "tvBackdropPath"
-internal const val tvIdArg = "tvId"
-internal const val tvEpisodeNumArg = "tvEpisodeNum"
 
 internal const val seasonInfoArg = "seasonInfo"
 private const val tvSeasonListNavigationRoute = "tv_season_list_navigation_route"
 
-internal class TVArgs(
-    val tvId: Int,
-    val tvEpisodeNum: Int,
-) {
+internal const val seasonDetailArg = "seasonDetail"
+private const val tvSeasonDetailNavigationRoute = "tv_season_detail_navigation_route"
+
+internal class SeasonArgs(val param: SeasonDetailParam?) {
     constructor(savedStateHandle: SavedStateHandle) : this(
-        savedStateHandle.get<Int>(tvIdArg) ?: 0,
-        savedStateHandle.get<Int>(tvEpisodeNumArg) ?: 0,
+        savedStateHandle.get<SeasonDetailParam>(seasonDetailArg)
     )
 }
 
@@ -49,6 +44,21 @@ internal class SeasonInfoNavType : NavType<SeasonInfo>(isNullableAllowed = false
     }
 }
 
+internal class SeasonDetailNavType : NavType<SeasonDetailParam>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): SeasonDetailParam? {
+        return bundle.getParcelable(key)
+    }
+
+    override fun parseValue(value: String): SeasonDetailParam {
+        return Gson().fromJson(value, SeasonDetailParam::class.java)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: SeasonDetailParam) {
+        bundle.putParcelable(key, value)
+    }
+}
+
+
 fun NavController.navigateToTVSeasonList(seasonInfo: SeasonInfo) {
     val seasonsInfoJson = Uri.encode(Gson().toJson(seasonInfo))
     this.navigate("$tvSeasonListNavigationRoute/$seasonsInfoJson")
@@ -56,7 +66,7 @@ fun NavController.navigateToTVSeasonList(seasonInfo: SeasonInfo) {
 
 fun NavGraphBuilder.tvSeasonListScreen(
     onBackClick: (Boolean) -> Unit,
-    toTVEpisodeDetail: (Int, String, Int, Int) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
 ) {
     composable(
         route = "$tvSeasonListNavigationRoute/{$seasonInfoArg}",
@@ -68,40 +78,31 @@ fun NavGraphBuilder.tvSeasonListScreen(
     ) {
         TVSeasonListRoute(
             onBackClick = onBackClick,
+            toSeasonDetail = toSeasonDetail,
         )
     }
 }
 
+fun NavController.navigateToSeasonDetail(param: SeasonDetailParam) {
+    val seasonDetailParamJson = Uri.encode(Gson().toJson(param))
+    this.navigate("$tvSeasonDetailNavigationRoute/$seasonDetailParamJson")
+}
 
-//fun NavController.navigateToTVEpisodeDetail(
-//    tvId: Int,
-//    tvBackdropPath: String,
-//    tvSeasonNum: Int,
-//    tvEpisodeNum: Int,
-//) {
-//    this.navigate("$tvSeasonNavigationRoute/$tvBackdropPath/$tvId/$tvSeasonNum/$tvEpisodeNum")
-//}
-//
-//fun NavGraphBuilder.tvEpisodeDetailScreen(
-//    onBackClick: (Boolean) -> Unit,
-//) {
-//    composable(
-//        route = "$tvSeasonNavigationRoute/{$tvBackdropPathArg}/{$tvIdArg}/{$tvSeasonsArg}/{$tvEpisodeNumArg}",
-//        arguments = listOf(
-//            navArgument(tvBackdropPathArg) {
-//                type = NavType.StringType
-//            },
-//            navArgument(tvIdArg) {
-//                type = NavType.IntType
-//            },
-//            navArgument(tvSeasonsArg) {
-//                type = NavType.IntType
-//            },
-//            navArgument(tvEpisodeNumArg) {
-//                type = NavType.IntType
-//            },
-//        )
-//    ) {
-//
-//    }
-//}
+fun NavGraphBuilder.tvSeasonDetailScreen(
+    onBackClick: (Boolean) -> Unit,
+) {
+    composable(
+        route = "$tvSeasonDetailNavigationRoute/{$seasonDetailArg}",
+        arguments = listOf(
+            navArgument(seasonDetailArg) {
+                type = SeasonDetailNavType()
+            },
+        )
+    ) {
+        val tvName = it.arguments?.getParcelable<SeasonDetailParam>(seasonDetailArg)?.tvName ?: ""
+        TVSeasonDetailRoute(
+            tvName = tvName,
+            onBackClick = onBackClick,
+        )
+    }
+}

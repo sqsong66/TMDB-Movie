@@ -130,7 +130,7 @@ fun AccountMediaListsScreen(
                         mediaType = mediaType,
                         mediaItem = mediaItem,
                         onBuildImage = { url, type, size ->
-                            configStream.value.buildImageUrl(type, url, size)
+                            configStream.value.buildImageUrl(url, type, size)
                         },
                         toMediaDetail = toMediaDetail,
                     )

@@ -56,7 +56,7 @@ data class TMDBConfig(
     val userData: UserData? = null,
 ) {
 
-    fun buildImageUrl(@ImageType imageType: Int, imagePath: String?, @ImageSize imageSize: Int = ImageSize.MEDIUM): String {
+    fun buildImageUrl(imagePath: String?, @ImageType imageType: Int, @ImageSize imageSize: Int = ImageSize.MEDIUM): String {
         return if (imagePath.isNullOrEmpty()) {
             ""
         } else {
@@ -155,9 +155,9 @@ data class TMDBConfig(
             val profileUrl = it.avatar?.tmdb?.avatarPath
             if (!profileUrl.isNullOrEmpty()) {
                 if (isSmall) {
-                    buildImageUrl(ImageType.PROFILE, profileUrl, ImageSize.SMALL)
+                    buildImageUrl(profileUrl, ImageType.PROFILE, ImageSize.SMALL)
                 } else {
-                    buildImageUrl(ImageType.PROFILE, profileUrl, ImageSize.LARGE)
+                    buildImageUrl(profileUrl, ImageType.PROFILE, ImageSize.LARGE)
                 }
             } else {
                 val gravatarHash = it.avatar?.gravatar?.hash

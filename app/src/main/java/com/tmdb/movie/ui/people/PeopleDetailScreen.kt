@@ -72,7 +72,7 @@ fun PeopleDetailRoute(
     PeopleDetailScreen(peopleDetailUiState = peopleDetailUiState,
         peopleCredits = peopleCredits,
         onBackClick = { onBackClick(detailType == 0) },
-        onBuildImage = { url, type, size -> config.buildImageUrl(type, url, size) },
+        onBuildImage = { url, type, size -> config.buildImageUrl(url, type, size) },
         toMovieDetail = toMovieDetail,
         onPreviewImage = { url ->
             previewImageUrl = url

@@ -263,7 +263,9 @@ data class Season(
     @SerializedName("season_number")
     val seasonNumber: Int = 0,
     @SerializedName("vote_average")
-    val voteAverage: Float = 0.0f
+    val voteAverage: Float = 0.0f,
+    @SerializedName("episodes")
+    val episodes: List<Episode>? = null
 ) : Parcelable {
 
     fun getSeasonOverview(context: Context): String {
@@ -282,4 +284,43 @@ data class Season(
         return "Season(airDate=$airDate, episodeCount=$episodeCount, id=$id, name=$name, overview=$overview, posterPath=$posterPath, seasonNumber=$seasonNumber, voteAverage=$voteAverage)"
     }
 
+    fun getTVAirYear(): String {
+        if (airDate.isNullOrEmpty() || airDate.length < 4) return "--"
+        return airDate.substring(0, 4)
+    }
+
 }
+
+@Parcelize
+data class Episode(
+    @SerializedName("air_date")
+    val airDate: String? = null,
+    @SerializedName("episode_number")
+    val episodeNumber: Int = 0,
+    @SerializedName("episode_type")
+    val episodeType: String? = null,
+    @SerializedName("id")
+    val id: Int = 0,
+    @SerializedName("name")
+    val name: String? = null,
+    @SerializedName("overview")
+    val overview: String? = null,
+    @SerializedName("production_code")
+    val productionCode: String? = null,
+    @SerializedName("runtime")
+    val runtime: Int = 0,
+    @SerializedName("season_number")
+    val seasonNumber: Int= 0,
+    @SerializedName("show_id")
+    val showId: Int = 0,
+    @SerializedName("still_path")
+    val stillPath: String? = null,
+    @SerializedName("vote_average")
+    val voteAverage: Float = 0f,
+    @SerializedName("vote_count")
+    val voteCount: Int = 0,
+    @SerializedName("crew")
+    val crew: List<Crew>? = null,
+    @SerializedName("guest_stars")
+    val guestStars: List<Cast>? = null
+) : Parcelable

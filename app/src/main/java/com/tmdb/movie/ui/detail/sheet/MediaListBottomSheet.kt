@@ -20,6 +20,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +35,8 @@ import com.tmdb.movie.R
 import com.tmdb.movie.component.myiconpack.emptyDataVector
 import com.tmdb.movie.data.MediaList
 import com.tmdb.movie.ui.theme.TMDBMovieTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +45,7 @@ fun MediaListBottomSheet(
     mediaList: List<MediaList>? = null,
     onMediaListClick: (MediaList) -> Unit,
     onCreateList: () -> Unit,
+    coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -55,7 +59,12 @@ fun MediaListBottomSheet(
         MediaListBottomSheetContent(
             mediaList = mediaList,
             onMediaListClick = onMediaListClick,
-            onCreateList = onCreateList,
+            onCreateList = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    onCreateList()
+                }
+            },
         )
     }
 }

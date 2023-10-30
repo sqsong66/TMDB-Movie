@@ -16,6 +16,7 @@ import com.tmdb.movie.data.PeopleDetails
 import com.tmdb.movie.data.RequestTokenInfo
 import com.tmdb.movie.data.ResponseResult
 import com.tmdb.movie.data.Result
+import com.tmdb.movie.data.Season
 import com.tmdb.movie.data.TMDBConfig
 import com.tmdb.movie.data.TMDBConfiguration
 import com.tmdb.movie.data.UserData
@@ -98,4 +99,6 @@ interface IMovieRepository {
         @MediaType mediaType: Int = 0,
         @AccountMediaType accountMediaType: Int = 0
     ): AccountMediaListsPagingSource
+
+    fun getSeasonDetail(tvId: Int, seasonNumber: Int, ): Flow<Result<Season>>
 }

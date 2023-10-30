@@ -27,6 +27,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -312,7 +313,7 @@ fun PeopleCastComponent(
                         .size(45.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    HorizontalDivider(
+                    VerticalDivider(
                         modifier = Modifier
                             .width(1.dp)
                             .fillMaxHeight(),
@@ -326,12 +327,12 @@ fun PeopleCastComponent(
                 }
             }
 
-            Divider(
+            VerticalDivider(
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .width(1.dp)
                     .fillMaxHeight()
                     .weight(1f)
+                    .width(1.dp)
             )
         }
 

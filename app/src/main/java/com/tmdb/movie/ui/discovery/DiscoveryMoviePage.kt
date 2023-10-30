@@ -59,7 +59,7 @@ fun DiscoveryMovieRoute(
         onPullRefreshProgress = onPullRefreshProgress,
         movieList = discoveryMoviePagingSource,
         onBuildImage = { path, type ->
-            config.buildImageUrl(type, path)
+            config.buildImageUrl(path, type)
         },
         toDetail = toDetail,
     )

@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tmdb.movie.data.ImageSize
 import com.tmdb.movie.data.ImageType
 import com.tmdb.movie.data.Season
+import com.tmdb.movie.data.SeasonDetailParam
 import com.tmdb.movie.data.SeasonInfo
 import com.tmdb.movie.ui.tv.component.SeasonCollapsingHeader
 import com.tmdb.movie.ui.tv.component.SeasonListBody
@@ -29,6 +30,7 @@ import com.tmdb.movie.ui.tv.vm.TVDetailViewModel
 @Composable
 fun TVSeasonListRoute(
     onBackClick: (Boolean) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
     viewModel: TVDetailViewModel = hiltViewModel(),
 ) {
 
@@ -44,8 +46,9 @@ fun TVSeasonListRoute(
         seasonInfo = seasonInfo,
         onBackClick = onBackClick,
         onBuildImage = { url, type, size ->
-            config.buildImageUrl(type, url, size)
+            config.buildImageUrl(url, type, size)
         },
+        toSeasonDetail = toSeasonDetail,
     )
 }
 
@@ -53,6 +56,7 @@ fun TVSeasonListRoute(
 fun TVSeasonListScreen(
     seasonInfo: SeasonInfo?,
     onBackClick: (Boolean) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
     onBuildImage: (String?, @ImageType Int, @ImageSize Int) -> String? = { url, _, _ -> url },
 ) {
     val listState = rememberLazyListState()
@@ -76,7 +80,10 @@ fun TVSeasonListScreen(
             listState = listState,
             headerHeight = headerHeight,
             seasons = seasonInfo?.seasons,
-            onBuildImage = onBuildImage
+            onBuildImage = onBuildImage,
+            toSeasonDetail = {
+                toSeasonDetail(SeasonDetailParam(seasonInfo?.tvId ?: 0, seasonInfo?.tvName ?: "", it))
+            }
         )
 
         SeasonListTopBar(
@@ -149,5 +156,6 @@ fun PreviewTVSeasonListScreen() {
         onBuildImage = { url, type, size ->
             ""
         },
+        toSeasonDetail = { }
     )
 }

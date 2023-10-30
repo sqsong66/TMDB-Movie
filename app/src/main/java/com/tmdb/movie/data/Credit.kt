@@ -1,8 +1,10 @@
 package com.tmdb.movie.data
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
-
+@Parcelize
 data class Cast(
     @SerializedName("adult")
     val adult: Boolean = false,
@@ -28,8 +30,9 @@ data class Cast(
     val popularity: Float = 0.0f,
     @SerializedName("profile_path")
     val profilePath: String? = null
-)
+) : Parcelable
 
+@Parcelize
 data class Crew(
     @SerializedName("adult")
     val adult: Boolean = false,
@@ -53,4 +56,4 @@ data class Crew(
     val popularity: Float = 0.0f,
     @SerializedName("profile_path")
     val profilePath: String? = null
-)
+) : Parcelable

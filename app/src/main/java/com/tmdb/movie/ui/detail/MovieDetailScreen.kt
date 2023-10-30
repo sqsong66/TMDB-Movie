@@ -1,6 +1,7 @@
 package com.tmdb.movie.ui.detail
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -57,6 +58,7 @@ import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MovieImage
 import com.tmdb.movie.data.Season
+import com.tmdb.movie.data.SeasonDetailParam
 import com.tmdb.movie.data.SeasonInfo
 import com.tmdb.movie.data.Video
 import com.tmdb.movie.ui.detail.component.LatestSeasonComponent
@@ -96,7 +98,7 @@ fun MovieDetailRoute(
     onCreateList: () -> Unit,
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
-    toSeasonDetail: (String, Int, List<Season>) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
     viewModel: MovieDetailViewModel = hiltViewModel(),
@@ -128,6 +130,7 @@ fun MovieDetailRoute(
     }
 
     LaunchedEffect(mediaListUiState) {
+        Log.w("sqsong", "LaunchedEffect mediaListUiState: $mediaListUiState")
         if (mediaListUiState is MediaListUiState.Success) {
             showMediaListBottomSheet = true
         }
@@ -157,7 +160,9 @@ fun MovieDetailRoute(
 
     if (showMediaListBottomSheet && mediaListUiState is MediaListUiState.Success) {
         MediaListBottomSheet(
-            onDismiss = { showMediaListBottomSheet = false },
+            onDismiss = {
+                viewModel.resetMediaListState()
+            },
             mediaList = (mediaListUiState as MediaListUiState.Success).mediaList,
             onMediaListClick = { mediaList ->
                 if (!config.isLogin()) {
@@ -169,7 +174,7 @@ fun MovieDetailRoute(
             },
             onCreateList = {
                 onCreateList()
-                showMediaListBottomSheet = false
+                viewModel.resetMediaListState()
             },
         )
     }
@@ -190,7 +195,7 @@ fun MovieDetailRoute(
             images = allImages,
             onBottomSheetDismiss = { showAllImagesBottomSheet = false },
             onBuildImage = { url, type ->
-                config.buildImageUrl(type, url)
+                config.buildImageUrl(url, type)
             },
         )
     }
@@ -201,7 +206,7 @@ fun MovieDetailRoute(
             onBottomSheetDismiss = { showAllCastsBottomSheet = false },
             onPeopleDetail = onNavigateToPeopleDetail,
             onBuildImage = { url, _ ->
-                config.buildImageUrl(ImageType.PROFILE, url)
+                config.buildImageUrl(url, ImageType.PROFILE)
             },
         )
     }
@@ -213,7 +218,7 @@ fun MovieDetailRoute(
         accountState = accountState,
         onBackClick = { onBackClick(movieFrom == 0) },
         onBuildImage = { url, type, size ->
-            config.buildImageUrl(type, url, size)
+            config.buildImageUrl(url, type, size)
         },
         onVideoClick = { videoKey, isYouTuBe ->
             playMediaVideo(context, videoKey, isYouTuBe)
@@ -307,7 +312,7 @@ fun MovieDetailScreen(
     onWatchlist: () -> Unit,
     onAddList: () -> Unit,
     onShare: () -> Unit,
-    toSeasonDetail: (String, Int, List<Season>) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
 ) {
@@ -468,7 +473,7 @@ fun MovieDetailComponent(
     onMoreVideos: (List<Video>) -> Unit,
     onMoreImages: (@ImageType Int, List<MovieImage>) -> Unit,
     onPeopleDetail: (Int) -> Unit,
-    toSeasonDetail: (String, Int, List<Season>) -> Unit,
+    toSeasonDetail: (SeasonDetailParam) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
     toEpisodeDetail: (String, Int, Int, Int) -> Unit,
 ) {
@@ -517,7 +522,7 @@ fun MovieDetailComponent(
                 episodeToAir = movieDetails.nextEpisodeToAir ?: movieDetails.lastEpisodeToAir,
                 onBuildImage = onBuildImage,
                 toSeasonDetail = { seasonNum ->
-                    toSeasonDetail(movieDetails.backdropPath ?: "", movieDetails.id, movieDetails.seasons)
+                    toSeasonDetail(SeasonDetailParam(movieDetails.id, movieDetails.getMovieName(mediaType) ?: "", seasonNum))
                 },
                 toEpisodeDetail = { seasonNum, episodeNum ->
                     toEpisodeDetail(movieDetails.backdropPath ?: "", movieDetails.id, seasonNum, episodeNum)
@@ -629,7 +634,7 @@ fun MovieDetailScreenPreview() {
             onAddList = {},
             onShare = {},
             onPreviewImage = {},
-            toSeasonDetail = { _, _, _ -> },
+            toSeasonDetail = { _ -> },
             toEpisodeDetail = { _, _, _, _ -> },
             toSeasonList = { _ -> },
         )

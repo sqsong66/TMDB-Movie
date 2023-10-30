@@ -46,7 +46,7 @@ fun MovieDetailMoreAction(
             onDismissRequest = { showDropdownMenu = false },
         ) {
             DropdownMenuItem(
-                text = { Text(text = stringResource(if (accountState?.watchlist == true) R.string.key_remove_from_watchlist else R.string.key_add_to_watchlist)) },
+                text = { Text(text = stringResource(/*if (accountState?.watchlist == true) R.string.key_remove_from_watchlist else*/ R.string.key_add_to_watchlist)) },
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = if (accountState?.watchlist == true) R.drawable.baseline_bookmark_added_24 else R.drawable.outline_bookmark_add_24),

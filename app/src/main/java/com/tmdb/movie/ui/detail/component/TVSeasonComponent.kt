@@ -239,7 +239,7 @@ fun TVSeasonCard(
                             .padding(end = 16.dp),
                         text = String.format(
                             stringResource(R.string.key_year_episodes),
-                            lastSeason.airDate?.substring(0, 4),
+                            lastSeason.getTVAirYear(),
                             lastSeason.episodeCount
                         ),
                         style = MaterialTheme.typography.labelMedium.copy(

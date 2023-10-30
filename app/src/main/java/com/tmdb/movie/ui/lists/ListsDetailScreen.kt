@@ -46,7 +46,7 @@ fun ListsDetailRoute(
         toMediaDetail = toMediaDetail,
         onBackClick = onBackClick,
         onBuildImage = { url, type, size ->
-            config.buildImageUrl(type, url, size)
+            config.buildImageUrl(url, type, size)
         }
     )
 }
