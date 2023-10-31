@@ -5,6 +5,7 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.tmdb.movie.R
 import com.tmdb.movie.ext.formatWithCommasAndDecimals
+import com.tmdb.movie.utils.formatMinuteToHM
 import com.tmdb.movie.utils.niceDate
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
@@ -231,7 +232,7 @@ data class EpisodeToAir(
     }
 
     fun niceAirDate(): String {
-        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: ""
+        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: "--"
     }
 }
 
@@ -277,7 +278,7 @@ data class Season(
     }
 
     fun niceAirDate(): String {
-        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: ""
+        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: "--"
     }
 
     override fun toString(): String {
@@ -322,5 +323,23 @@ data class Episode(
     @SerializedName("crew")
     val crew: List<Crew>? = null,
     @SerializedName("guest_stars")
-    val guestStars: List<Cast>? = null
-) : Parcelable
+    val guestStars: List<Cast>? = null,
+    @SerializedName("images")
+    val images: StillImage? = null,
+) : Parcelable {
+    fun niceAirDate(): String {
+        return niceDate(airDate, format = "yyyy-MM-dd", dateFormat = DateFormat.MEDIUM) ?: "--"
+    }
+
+    fun getDuration(): String {
+        return formatMinuteToHM(runtime)
+    }
+
+    fun getEpisodeOverview(context: Context): String {
+        return if (overview.isNullOrEmpty()) {
+            context.getString(R.string.key_no_overview)
+        } else {
+            overview.trim()
+        }
+    }
+}

@@ -1,6 +1,8 @@
 package com.tmdb.movie.data
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 
 data class ImagesData(
@@ -14,6 +16,7 @@ data class ImagesData(
     val posters: List<MovieImage>? = null
 )
 
+@Parcelize
 data class MovieImage(
     @SerializedName("aspect_ratio")
     val aspectRatio: Float = 0.0f,
@@ -29,4 +32,10 @@ data class MovieImage(
     val voteCount: Int = 0,
     @SerializedName("width")
     val width: Int = 0,
-)
+) : Parcelable
+
+@Parcelize
+data class StillImage(
+    @SerializedName("stills")
+    val stills: List<MovieImage>? = null
+) : Parcelable

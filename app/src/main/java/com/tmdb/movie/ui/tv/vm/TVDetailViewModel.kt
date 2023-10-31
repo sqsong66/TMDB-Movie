@@ -49,4 +49,18 @@ class TVDetailViewModel @Inject constructor(
             initialValue = null,
         )
 
+    val episodeDetail = repository.getEpisodeDetail(tvId, seasonNumber, episodeNumber)
+        .map {
+            if (it is Result.Success) {
+                it.data
+            } else {
+                null
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null,
+        )
+
 }

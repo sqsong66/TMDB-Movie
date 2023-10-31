@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.CreateListParam
+import com.tmdb.movie.data.Episode
 import com.tmdb.movie.data.FavoriteRequest
 import com.tmdb.movie.data.HomePopularMovie
 import com.tmdb.movie.data.ImagesData
@@ -301,6 +302,10 @@ class TMDBMovieRepository @Inject constructor(
 
     override fun getSeasonDetail(tvId: Int, seasonNumber: Int): Flow<Result<Season>> = flow {
         emit(apiService.getSeasonDetails(tvId, seasonNumber))
+    }.asResult()
+
+    override fun getEpisodeDetail(tvId: Int, seasonNumber: Int, episodeNumber: Int): Flow<Result<Episode>> = flow {
+        emit(apiService.getEpisodeDetails(tvId, seasonNumber, episodeNumber))
     }.asResult()
 
 }

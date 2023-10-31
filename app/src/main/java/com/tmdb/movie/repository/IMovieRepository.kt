@@ -3,6 +3,7 @@ package com.tmdb.movie.repository
 import com.tmdb.movie.data.AccountMediaType
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.CreateListParam
+import com.tmdb.movie.data.Episode
 import com.tmdb.movie.data.HomePopularMovie
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.ListsDetail
@@ -101,4 +102,6 @@ interface IMovieRepository {
     ): AccountMediaListsPagingSource
 
     fun getSeasonDetail(tvId: Int, seasonNumber: Int, ): Flow<Result<Season>>
+
+    fun getEpisodeDetail(tvId: Int, seasonNumber: Int, episodeNumber: Int, ): Flow<Result<Episode>>
 }

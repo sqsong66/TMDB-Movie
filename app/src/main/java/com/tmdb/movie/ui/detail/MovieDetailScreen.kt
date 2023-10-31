@@ -57,7 +57,6 @@ import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.MediaType
 import com.tmdb.movie.data.MovieDetails
 import com.tmdb.movie.data.MovieImage
-import com.tmdb.movie.data.Season
 import com.tmdb.movie.data.SeasonDetailParam
 import com.tmdb.movie.data.SeasonInfo
 import com.tmdb.movie.data.Video
@@ -99,7 +98,7 @@ fun MovieDetailRoute(
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
     toSeasonDetail: (SeasonDetailParam) -> Unit,
-    toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toEpisodeDetail: (SeasonDetailParam) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
     viewModel: MovieDetailViewModel = hiltViewModel(),
 ) {
@@ -313,7 +312,7 @@ fun MovieDetailScreen(
     onAddList: () -> Unit,
     onShare: () -> Unit,
     toSeasonDetail: (SeasonDetailParam) -> Unit,
-    toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toEpisodeDetail: (SeasonDetailParam) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
 ) {
     val title = if (movieDetailUiState is MovieDetailUiState.Success) {
@@ -475,7 +474,7 @@ fun MovieDetailComponent(
     onPeopleDetail: (Int) -> Unit,
     toSeasonDetail: (SeasonDetailParam) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
-    toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toEpisodeDetail: (SeasonDetailParam) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -525,7 +524,7 @@ fun MovieDetailComponent(
                     toSeasonDetail(SeasonDetailParam(movieDetails.id, movieDetails.getMovieName(mediaType) ?: "", seasonNum))
                 },
                 toEpisodeDetail = { seasonNum, episodeNum ->
-                    toEpisodeDetail(movieDetails.backdropPath ?: "", movieDetails.id, seasonNum, episodeNum)
+                    toEpisodeDetail(SeasonDetailParam(movieDetails.id, movieDetails.getMovieName(mediaType) ?: "", seasonNum, episodeNum))
                 },
                 toSeasonList = {
                     val seasonInfo = SeasonInfo(
@@ -593,19 +592,19 @@ fun MovieDetailScreenPreview() {
         ),
         videos = com.tmdb.movie.data.Videos(
             results = listOf(
-                com.tmdb.movie.data.Video(
+                Video(
                     key = "https://www.youtube.com/watch?v=5PSNL1qE6VY",
                     name = "阿凡达：水之道",
                     site = "YouTube",
                     type = "Trailer",
                 ),
-                com.tmdb.movie.data.Video(
+                Video(
                     key = "https://www.youtube.com/watch?v=5PSNL1qE6VY",
                     name = "阿凡达：水之道",
                     site = "YouTube",
                     type = "Trailer",
                 ),
-                com.tmdb.movie.data.Video(
+                Video(
                     key = "https://www.youtube.com/watch?v=5PSNL1qE6VY",
                     name = "阿凡达：水之道",
                     site = "YouTube",
@@ -635,7 +634,7 @@ fun MovieDetailScreenPreview() {
             onShare = {},
             onPreviewImage = {},
             toSeasonDetail = { _ -> },
-            toEpisodeDetail = { _, _, _, _ -> },
+            toEpisodeDetail = { },
             toSeasonList = { _ -> },
         )
     }

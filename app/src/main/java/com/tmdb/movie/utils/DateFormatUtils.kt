@@ -40,3 +40,14 @@ fun formatToMonthDay(timeStr: String?, format: String = "yyyy-MM-dd"): String {
     }
     return ""
 }
+
+fun formatMinuteToHM(minute: Int): String {
+//    val hour = minute / 60
+//    val min = minute % 60
+//    return if (hour > 0) {
+//        "${hour}h ${min}m"
+//    } else {
+//        "${min}m"
+//    }
+    return "${minute}m"
+}

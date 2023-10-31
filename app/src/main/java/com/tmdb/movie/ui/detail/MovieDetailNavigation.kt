@@ -37,7 +37,7 @@ fun NavGraphBuilder.movieDetailScreen(
     onBackClick: (Boolean) -> Unit,
     onNavigateToPeopleDetail: (Int) -> Unit,
     toSeasonDetail: (SeasonDetailParam) -> Unit,
-    toEpisodeDetail: (String, Int, Int, Int) -> Unit,
+    toEpisodeDetail: (SeasonDetailParam) -> Unit,
     toSeasonList: (SeasonInfo) -> Unit,
 ) {
     composable(

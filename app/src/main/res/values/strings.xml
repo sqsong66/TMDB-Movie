@@ -123,4 +123,9 @@
     <string name="key_year_episodes">%1$s&#160;•&#160;%2$d Episodes</string>
     <string name="key_season_finale">Season Finale</string>
     <string name="key_season_desc">%1$s of %2$s premiered on %3$s.</string>
+    <string name="key_air_date">Air Date</string>
+    <string name="key_duration">Duration</string>
+    <string name="key_score">Score</string>
+    <string name="key_guest_stars">Guest Stars</string>
+    <string name="key_episode_images">Episode Images</string>
 </resources>

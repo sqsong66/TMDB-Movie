@@ -142,13 +142,13 @@ fun SeasonDetailHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .height(imageHeight.pxToDp() * 2 / 3)
+                .height(imageHeight.pxToDp() / 2)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.background.copy(alpha = 0.0f),
                             MaterialTheme.colorScheme.background,
-                        )
+                        ),
                     )
                 )
         )
@@ -171,22 +171,24 @@ fun SeasonDetailHeader(
                     .fillMaxWidth()
                     .padding(start = 16.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    modifier = Modifier.size(16.dp),
-                    painter = painterResource(id = R.drawable.baseline_schedule_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-                )
-                Text(
-                    modifier = Modifier.padding(start = 4.dp),
-                    text = season.niceAirDate(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-                    ),
-                )
+                if (!season.airDate.isNullOrEmpty()) {
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        painter = painterResource(id = R.drawable.baseline_schedule_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 4.dp, end = 16.dp),
+                        text = season.niceAirDate(),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                        ),
+                    )
+                }
 
                 RatingBar(
-                    modifier = Modifier.padding(start = 16.dp),
+                    modifier = Modifier,
                     value = season.voteAverage / 2,
                     style = RatingBarStyle.Fill(
                         activeColor = MaterialTheme.colorScheme.primary,

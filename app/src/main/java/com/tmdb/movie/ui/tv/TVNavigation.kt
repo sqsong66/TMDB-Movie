@@ -18,6 +18,9 @@ private const val tvSeasonListNavigationRoute = "tv_season_list_navigation_route
 internal const val seasonDetailArg = "seasonDetail"
 private const val tvSeasonDetailNavigationRoute = "tv_season_detail_navigation_route"
 
+internal const val episodeDetailArg = "episodeDetail"
+private const val tvEpisodeDetailNavigationRoute = "tv_episode_detail_navigation_route"
+
 internal class SeasonArgs(val param: SeasonDetailParam?) {
     constructor(savedStateHandle: SavedStateHandle) : this(
         savedStateHandle.get<SeasonDetailParam>(seasonDetailArg)
@@ -59,6 +62,7 @@ internal class SeasonDetailNavType : NavType<SeasonDetailParam>(isNullableAllowe
 }
 
 
+/************** Season List ****************/
 fun NavController.navigateToTVSeasonList(seasonInfo: SeasonInfo) {
     val seasonsInfoJson = Uri.encode(Gson().toJson(seasonInfo))
     this.navigate("$tvSeasonListNavigationRoute/$seasonsInfoJson")
@@ -83,6 +87,7 @@ fun NavGraphBuilder.tvSeasonListScreen(
     }
 }
 
+/************** Season Detail ****************/
 fun NavController.navigateToSeasonDetail(param: SeasonDetailParam) {
     val seasonDetailParamJson = Uri.encode(Gson().toJson(param))
     this.navigate("$tvSeasonDetailNavigationRoute/$seasonDetailParamJson")
@@ -90,6 +95,7 @@ fun NavController.navigateToSeasonDetail(param: SeasonDetailParam) {
 
 fun NavGraphBuilder.tvSeasonDetailScreen(
     onBackClick: (Boolean) -> Unit,
+    toEpisodeDetail: (SeasonDetailParam) -> Unit,
 ) {
     composable(
         route = "$tvSeasonDetailNavigationRoute/{$seasonDetailArg}",
@@ -99,9 +105,41 @@ fun NavGraphBuilder.tvSeasonDetailScreen(
             },
         )
     ) {
-        val tvName = it.arguments?.getParcelable<SeasonDetailParam>(seasonDetailArg)?.tvName ?: ""
+        val seasonParam = it.arguments?.getParcelable<SeasonDetailParam>(seasonDetailArg)
+
         TVSeasonDetailRoute(
-            tvName = tvName,
+            tvName = seasonParam?.tvName ?: "",
+            onBackClick = onBackClick,
+            toEpisodeDetail = { seasonNumber, episodeNumber ->
+                toEpisodeDetail(SeasonDetailParam(
+                    tvId = seasonParam?.tvId ?: 0,
+                    tvName = seasonParam?.tvName ?: "",
+                    seasonNumber = seasonNumber,
+                    episodeNumber = episodeNumber,
+                ))
+            }
+        )
+    }
+}
+
+/************** Episode Detail ****************/
+fun NavController.navigateToEpisodeDetail(param: SeasonDetailParam) {
+    val seasonDetailParamJson = Uri.encode(Gson().toJson(param))
+    this.navigate("$tvEpisodeDetailNavigationRoute/$seasonDetailParamJson")
+}
+
+fun NavGraphBuilder.tvEpisodeDetailScreen(
+    onBackClick: (Boolean) -> Unit,
+) {
+    composable(
+        route = "$tvEpisodeDetailNavigationRoute/{$seasonDetailArg}",
+        arguments = listOf(
+            navArgument(seasonDetailArg) {
+                type = SeasonDetailNavType()
+            },
+        )
+    ) {
+        TVEpisodeDetailRoute(
             onBackClick = onBackClick,
         )
     }

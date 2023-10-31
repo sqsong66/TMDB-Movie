@@ -33,8 +33,10 @@ import com.tmdb.movie.ui.media.createListScreen
 import com.tmdb.movie.ui.media.navigateToCreateList
 import com.tmdb.movie.ui.people.navigateToPeopleDetail
 import com.tmdb.movie.ui.people.peopleDetailScreen
+import com.tmdb.movie.ui.tv.navigateToEpisodeDetail
 import com.tmdb.movie.ui.tv.navigateToSeasonDetail
 import com.tmdb.movie.ui.tv.navigateToTVSeasonList
+import com.tmdb.movie.ui.tv.tvEpisodeDetailScreen
 import com.tmdb.movie.ui.tv.tvSeasonDetailScreen
 import com.tmdb.movie.ui.tv.tvSeasonListScreen
 
@@ -120,8 +122,8 @@ fun TMDBNavHost(
                     toSeasonDetail = { param ->
                         navController.navigateToSeasonDetail(param)
                     },
-                    toEpisodeDetail = { backdropPath, tvId, seasonNum, episodeNum ->
-
+                    toEpisodeDetail = {
+                        navController.navigateToEpisodeDetail(it)
                     },
                     toSeasonList = { seasonInfo ->
                         navController.navigateToTVSeasonList(seasonInfo)
@@ -171,6 +173,10 @@ fun TMDBNavHost(
         )
         tvSeasonDetailScreen(
             onBackClick = onBackClick,
+            toEpisodeDetail = {
+                navController.navigateToEpisodeDetail(it)
+            }
         )
+        tvEpisodeDetailScreen(onBackClick)
     }
 }

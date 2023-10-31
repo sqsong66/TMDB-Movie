@@ -81,7 +81,8 @@ fun DiscoveryScreen(toDetail: (MediaItem?, @MediaType Int) -> Unit = { _, _ -> }
                 toDetail = toDetail,
             )
         }
-        DiscoveryTabRow(tabLists = tabList, modifier = Modifier
+        DiscoveryTabRow(tabLists = tabList,
+            modifier = Modifier
             .onGloballyPositioned {
                 toolbarHeight = it.size.height
             }

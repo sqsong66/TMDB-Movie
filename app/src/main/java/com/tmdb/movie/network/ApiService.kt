@@ -3,6 +3,7 @@ package com.tmdb.movie.network
 import com.tmdb.movie.data.AccountState
 import com.tmdb.movie.data.BaseListData
 import com.tmdb.movie.data.CreateListParam
+import com.tmdb.movie.data.Episode
 import com.tmdb.movie.data.FavoriteRequest
 import com.tmdb.movie.data.ImagesData
 import com.tmdb.movie.data.ListsDetail
@@ -187,5 +188,18 @@ interface ApiService {
     suspend fun getRatedTV(@Path("account_id") accountId: Int, @Query("page") page: Int): BaseListData<MediaItem>
 
     @GET("tv/{serial_id}/season/{season_number}")
-    suspend fun getSeasonDetails(@Path("serial_id") serialId: Int, @Path("season_number") seasonNumber: Int): Season
+    suspend fun getSeasonDetails(
+        @Path("serial_id") serialId: Int,
+        @Path("season_number") seasonNumber: Int,
+        @Query("language") language: String = getLanguage()
+    ): Season
+
+    @GET("tv/{serial_id}/season/{season_number}/episode/{episode_number}")
+    suspend fun getEpisodeDetails(
+        @Path("serial_id") serialId: Int,
+        @Path("season_number") seasonNumber: Int,
+        @Path("episode_number") episodeNumber: Int,
+        @Query("language") language: String = getLanguage(),
+        @Query("append_to_response") appendToResponse: String = "images"
+    ): Episode
 }
