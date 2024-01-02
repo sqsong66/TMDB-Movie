@@ -64,7 +64,7 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 3. In this project I generate a release keystore to build released apk, you maybe dont't need it, you can delete app's `build.gradle.kts` `signingConfigs` configuration.
 4. Sync and run to build apk.
 
-## Spported Features
+## Supported Features
 - [x] Popular movies, TVs People.
 - [x] Trending movies, TVs.
 - [x] Now playing movies, TVs.
@@ -77,12 +77,12 @@ The APP ui design specifications follow [Material Design3](https://m3.material.i
 - [x] Add movie, TV to list.
 - [x] Share movive, TV.
 - [x] Change theme.
-- [ ] Search movie, TV, people.
-- [ ] Rate movie, TV.
-- [ ] My list and list detials.
-- [ ] My watchlist movies, TVs.
-- [ ] My favorite movies, TVs.
-- [ ] My rated movies, TVs.
+- [x] Search movie, TV, people.
+- [x] Rate movie, TV.
+- [x] My list and list detials.
+- [x] My watchlist movies, TVs.
+- [x] My favorite movies, TVs.
+- [x] My rated movies, TVs.
 - [ ] ...
 
 ## ScreenShots
